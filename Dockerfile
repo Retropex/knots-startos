@@ -83,6 +83,7 @@ COPY --from=bitcoin-core /opt /opt
 COPY ./manager/target/${ARCH}-unknown-linux-musl/release/bitcoind-manager \
      ./docker_entrypoint.sh \
      ./actions/reindex.sh \
+     ./actions/reindex_chainstate.sh \
      ./actions/prioritise-transaction.sh \
      ./check-rpc.sh \
      ./check-synced.sh \
