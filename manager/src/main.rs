@@ -661,25 +661,6 @@ fn inner_main(reindex: bool, reindex_chainstate: bool) -> Result<(), Box<dyn Err
     std::process::exit(code)
 }
 
-fn main() -> Result<(), Box<dyn Error>> {
-    env_logger::Builder::from_env(Env::default().default_filter_or("warn")).init();
-    let reindex = Path::new("/root/.bitcoin/requires.reindex").exists();
-    let reindex_chainstate = Path::new("/root/.bitcoin/requires.reindex_chainstate").exists();
-    
-    ctrlc::set_handler(move || {
-        if let Some(raw_child) = *CHILD_PID.lock().unwrap() {
-            use nix::{
-                sys::signal::{kill, SIGTERM},
-                unistd::Pid,
-            };
-            kill(Pid::from_raw(raw_child as i32), SIGTERM).unwrap();
-        } else {
-            std::process::exit(143)
-        }
-    })?;
-    
-    inner_main(reindex, reindex_chainstate)
-}
 
 
 fn main() -> Result<(), Box<dyn Error>> {
