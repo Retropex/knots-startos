@@ -547,7 +547,7 @@ if mempool_info.status.success() {
 }
     
 
-fn inner_main(reindex: bool) -> Result<(), Box<dyn Error>> {
+fn inner_main(reindex: bool, reindex_chainstate: bool) -> Result<(), Box<dyn Error>> {
     while !Path::new("/root/.bitcoin/start9/config.yaml").exists() {
         std::thread::sleep(std::time::Duration::from_secs(1));
     }
@@ -560,6 +560,7 @@ fn inner_main(reindex: bool) -> Result<(), Box<dyn Error>> {
         format!("-onion={}:9050", var("EMBASSY_IP")?),
         format!("-externalip={}", peer_addr),
         "-datadir=/root/.bitcoin".to_owned(),
+        "-deprecatedrpc=warnings".to_owned(),
         "-conf=/root/.bitcoin/bitcoin.conf".to_owned(),
     ];
     if config
@@ -584,32 +585,33 @@ fn inner_main(reindex: bool) -> Result<(), Box<dyn Error>> {
     }
     if reindex {
         btc_args.push("-reindex".to_owned());
+    } else if reindex_chainstate {
+        btc_args.push("-reindex-chainstate".to_owned());
     }
-
-    std::io::copy(
-        &mut TemplatingReader::new(
-            std::fs::File::open("/mnt/assets/bitcoin.conf.template")?,
-            &config,
-            &"{{var}}".parse()?,
-            b'%',
-        ),
-        &mut std::fs::File::create("/root/.bitcoin/bitcoin.conf")?,
-    )?;
+    
     let mut child = std::process::Command::new("bitcoind")
         .args(btc_args)
         .spawn()?;
+    
     if reindex {
         match fs::remove_file("/root/.bitcoin/requires.reindex") {
             Ok(()) => (),
             Err(e) if e.kind() == std::io::ErrorKind::NotFound => (),
             a => a?,
         }
+    } else if reindex_chainstate {
+        match fs::remove_file("/root/.bitcoin/requires.reindex_chainstate") {
+            Ok(()) => (),
+            Err(e) if e.kind() == std::io::ErrorKind::NotFound => (),
+            a => a?,
+        }
     }
+    
     let raw_child = child.id();
     *CHILD_PID.lock().unwrap() = Some(raw_child);
+    
     let pruned = {
-        config[&Value::from("advanced")][&Value::from("pruning")][&Value::from("mode")]
-            == "automatic"
+        config[&Value::from("advanced")][&Value::from("pruning")][&Value::from("mode")] == "automatic"
     };
     let _proxy = if pruned {
         let state = Arc::new(btc_rpc_proxy::State {
@@ -655,13 +657,15 @@ fn inner_main(reindex: bool) -> Result<(), Box<dyn Error>> {
     } else {
         1
     };
-
+    
     std::process::exit(code)
 }
 
 fn main() -> Result<(), Box<dyn Error>> {
     env_logger::Builder::from_env(Env::default().default_filter_or("warn")).init();
     let reindex = Path::new("/root/.bitcoin/requires.reindex").exists();
+    let reindex_chainstate = Path::new("/root/.bitcoin/requires.reindex_chainstate").exists();
+    
     ctrlc::set_handler(move || {
         if let Some(raw_child) = *CHILD_PID.lock().unwrap() {
             use nix::{
@@ -673,7 +677,27 @@ fn main() -> Result<(), Box<dyn Error>> {
             std::process::exit(143)
         }
     })?;
-    inner_main(reindex)
+    
+    inner_main(reindex, reindex_chainstate)
+}
+
+
+fn main() -> Result<(), Box<dyn Error>> {
+    env_logger::Builder::from_env(Env::default().default_filter_or("warn")).init();
+    let reindex = Path::new("/root/.bitcoin/requires.reindex").exists();
+    let reindex_chainstate = Path::new("/root/.bitcoin/requires.reindex_chainstate").exists();
+    ctrlc::set_handler(move || {
+        if let Some(raw_child) = *CHILD_PID.lock().unwrap() {
+            use nix::{
+                sys::signal::{kill, SIGTERM},
+                unistd::Pid,
+            };
+            kill(Pid::from_raw(raw_child as i32), SIGTERM).unwrap();
+        } else {
+            std::process::exit(143)
+        }
+    })?;
+    inner_main(reindex, reindex_chainstate)
 }
 
 fn human_readable_timestamp(unix_time: u64) -> String {
