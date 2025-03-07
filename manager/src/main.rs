@@ -174,22 +174,6 @@ fn sidecar(config: &Mapping, addr: &str) -> Result<(), Box<dyn Error>> {
         .output()?;
     if info_res.status.success() {
         let info: ChainInfo = serde_json::from_slice(&info_res.stdout)?;
-        // Define the next halving block height
-        let next_halving = ((info.headers / 210000) * 210000) + 210000;
-        let progress_to_halving = 100.0 * (info.headers as f64 / next_halving as f64);
-        
-        stats.insert(
-            Cow::from("Progress to Next Halving"),
-            Stat {
-                value_type: "string",
-                value: format!("{:.2}%", progress_to_halving),
-                description: Some(Cow::from("Percentage progress towards the next Bitcoin halving event")),
-                copyable: false,
-                qr: false,
-                masked: false,
-            },
-        );
-        
         stats.insert(
             Cow::from("Blockchain Sync Summary"),
             Stat {
@@ -201,7 +185,7 @@ fn sidecar(config: &Mapping, addr: &str) -> Result<(), Box<dyn Error>> {
                 masked: false,
             },
         );
-        
+
         for (sf_name, sf_data) in info.softforks {
             let sf_name_pretty = sf_name.to_title_case();
             let status_desc = Some(Cow::from(format!(
