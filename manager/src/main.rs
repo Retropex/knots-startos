@@ -379,7 +379,6 @@ fn sidecar(config: &Mapping, addr: &str) -> Result<(), Box<dyn Error>> {
                     masked: false,
                 },
             );
-        }
     } else if info_res.status.code() == Some(28) {
         return Ok(());
     } else {
