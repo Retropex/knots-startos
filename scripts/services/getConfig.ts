@@ -416,7 +416,7 @@ export const getConfig: T.ExpectedExports.getConfig = async (effects) => {
               type: "boolean",
               name: "Use V2 P2P Transport Protocol",
               description: "Enable or disable the use of BIP324 V2 P2P transport protocol.",
-              default: false,
+              default: true,
             },
             addnode: {
               name: "Add Nodes",
