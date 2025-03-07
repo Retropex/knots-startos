@@ -201,46 +201,7 @@ fn sidecar(config: &Mapping, addr: &str) -> Result<(), Box<dyn Error>> {
                 masked: false,
             },
         );
-
-        stats.insert(
-            Cow::from("Block Height"),
-            Stat {
-                value_type: "string",
-                value: format!("{}", info.headers),
-                description: Some(Cow::from("The current block height for the network")),
-                copyable: false,
-                qr: false,
-                masked: false,
-            },
-        );
-        stats.insert(
-            Cow::from("Synced Block Height"),
-            Stat {
-                value_type: "string",
-                value: format!("{}", info.blocks),
-                description: Some(Cow::from("The number of blocks the node has verified")),
-                copyable: false,
-                qr: false,
-                masked: false,
-            },
-        );
-        stats.insert(
-            Cow::from("Sync Progress"),
-            Stat {
-                value_type: "string",
-                value: if info.blocks < info.headers {
-                    format!("{:.2}%", 100.0 * info.verificationprogress)
-                } else {
-                    "100%".to_owned()
-                },
-                description: Some(Cow::from(
-                    "The percentage of the blockchain that has been verified",
-                )),
-                copyable: false,
-                qr: false,
-                masked: false,
-            },
-        );
+        
         for (sf_name, sf_data) in info.softforks {
             let sf_name_pretty = sf_name.to_title_case();
             let status_desc = Some(Cow::from(format!(
