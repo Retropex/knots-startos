@@ -4,21 +4,21 @@ set -e
 
 action_result_running="    {
     \"version\": \"0\",
-    \"message\": \"Bitcoin Core restarting in reindex chainstate mode\",
+    \"message\": \"Bitcoin Knots restarting in reindex chainstate mode\",
     \"value\": null,
     \"copyable\": false,
     \"qr\": false
 }"
 action_result_stopped="    {
     \"version\": \"0\",
-    \"message\": \"Bitcoin Core will reindex the chainstate the next time the service is started\",
+    \"message\": \"Bitcoin Knots will reindex the chainstate the next time the service is started\",
     \"value\": null,
     \"copyable\": false,
     \"qr\": false
 }"
 action_result_pruned="    {
     \"version\": \"0\",
-    \"message\": \"Bitcoin Core does not allow reindex-chainstate for pruned nodes. If the Chainstate is corrupted on a pruned node the entire blockchain will need to be re-downloaded from genesis with the 'Reindex Blockchain' action\",
+    \"message\": \"Bitcoin Knots does not allow reindex-chainstate for pruned nodes. If the Chainstate is corrupted on a pruned node the entire blockchain will need to be re-downloaded from genesis with the 'Reindex Blockchain' action\",
     \"value\": null,
     \"copyable\": false,
     \"qr\": false
