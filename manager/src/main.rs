@@ -174,7 +174,6 @@ fn sidecar(config: &Mapping, addr: &str) -> Result<(), Box<dyn Error>> {
         .output()?;
     if info_res.status.success() {
         let info: ChainInfo = serde_json::from_slice(&info_res.stdout)?;
-        
         // Define the next halving block height
         let next_halving = ((info.headers / 210000) * 210000) + 210000;
         let progress_to_halving = 100.0 * (info.headers as f64 / next_halving as f64);
@@ -202,26 +201,46 @@ fn sidecar(config: &Mapping, addr: &str) -> Result<(), Box<dyn Error>> {
                 masked: false,
             },
         );
-    } else {
-        eprintln!(
-            "Error updating blockchain info: {}",
-            std::str::from_utf8(&info_res.stderr).unwrap_or("UNKNOWN ERROR")
+
+        stats.insert(
+            Cow::from("Block Height"),
+            Stat {
+                value_type: "string",
+                value: format!("{}", info.headers),
+                description: Some(Cow::from("The current block height for the network")),
+                copyable: false,
+                qr: false,
+                masked: false,
+            },
         );
-    }
-    
-    serde_yaml::to_writer(
-        std::fs::File::create("/root/.bitcoin/start9/.stats.yaml.tmp")?,
-        &Stats {
-            version: 2,
-            data: stats,
-        },
-    )?;
-    std::fs::rename(
-        "/root/.bitcoin/start9/.stats.yaml.tmp",
-        "/root/.bitcoin/start9/stats.yaml",
-    )?;
-    Ok(())
-}
+        stats.insert(
+            Cow::from("Synced Block Height"),
+            Stat {
+                value_type: "string",
+                value: format!("{}", info.blocks),
+                description: Some(Cow::from("The number of blocks the node has verified")),
+                copyable: false,
+                qr: false,
+                masked: false,
+            },
+        );
+        stats.insert(
+            Cow::from("Sync Progress"),
+            Stat {
+                value_type: "string",
+                value: if info.blocks < info.headers {
+                    format!("{:.2}%", 100.0 * info.verificationprogress)
+                } else {
+                    "100%".to_owned()
+                },
+                description: Some(Cow::from(
+                    "The percentage of the blockchain that has been verified",
+                )),
+                copyable: false,
+                qr: false,
+                masked: false,
+            },
+        );
         for (sf_name, sf_data) in info.softforks {
             let sf_name_pretty = sf_name.to_title_case();
             let status_desc = Some(Cow::from(format!(
@@ -379,6 +398,7 @@ fn sidecar(config: &Mapping, addr: &str) -> Result<(), Box<dyn Error>> {
                     masked: false,
                 },
             );
+        }
     } else if info_res.status.code() == Some(28) {
         return Ok(());
     } else {
