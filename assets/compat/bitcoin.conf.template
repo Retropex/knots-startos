@@ -124,6 +124,11 @@ zmqpubsequence=tcp://0.0.0.0:28333
 txindex=1
 }}
 
+## COINSTATSINDEX
+{{#IF coinstatsindex
+coinstatsindex=1
+}}
+
 ## DATACARRIER
 {{#IF blkconstr.datacarrier
 datacarrier=1
