@@ -13,6 +13,7 @@ import { reindexBlockchain } from './reindexBlockchain'
 import { reindexChainstate } from './reindexChainstate'
 import { runtimeInfo } from './runtimeInfo'
 import { assumeutxo } from './assumeutxo'
+import { prioritiseTransaction } from './prioritiseTransaction'
 
 export const actions = sdk.Actions.of()
   .addAction(runtimeInfo)
@@ -29,3 +30,4 @@ export const actions = sdk.Actions.of()
   .addAction(peerConfig)
   .addAction(generateRpcUserDependent)
   .addAction(assumeutxo)
+  .addAction(prioritiseTransaction)
