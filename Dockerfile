@@ -74,6 +74,7 @@ RUN apk --no-cache add \
   sqlite-dev \
   tini \
   yq \
+  jq \
 RUN rm -rf /var/cache/apk/*
 
 ARG ARCH
