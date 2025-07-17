@@ -3,57 +3,24 @@ import { sdk } from '../sdk'
 import { rootDir } from '../utils'
 import { rpcPort } from '../utils'
 import { mainMounts } from '../main'
-const { InputSpec, Value } = sdk
 
-export const inputSpec = InputSpec.of({
-  address: Value.dynamicText(async ({ effects }) => {
-    return {
-      name: 'Address',
-      description: 'The Bitcoin address you want to use to sign the message.',
-      required: true,
-      default: null,
-      patterns: [
-        {
-          regex: '^[a-zA-Z0-9]+$',
-          description: 'Must be alphanumeric.',
-        },
-      ],
-    }
-  }),
-  message: Value.dynamicText(async ({ effects }) => {
-    return {
-      name: 'Message',
-      description: 'The message you want to sign.',
-      required: true,
-      default: null,
-    }
-  }),
-})
-
-export const signMessage = sdk.Action.withInput(
+export const getaddress = sdk.Action.withoutInput(
   // id
-  'sign-message',
+  'get-address',
 
   // metadata
   async ({ effects }) => ({
-    name: 'Sign Message',
+    name: 'Get Address',
     description:
-      'Sign a message with one of your Bitcoin address.',
+      'Get a new segwit address.',
     warning: null,
     allowedStatuses: 'any',
     group: 'Wallet',
     visibility: 'enabled',
   }),
 
-  // input spec
-  inputSpec,
-
-  // optionally pre-fill form
-  async ({ effects }) => {},
-
   // execution function
-  async ({ effects, input }) => {
-    const { address, message } = input
+  async ({ effects }) => {
 
     const mountpoint = '/scripts'
     
@@ -71,12 +38,10 @@ export const signMessage = sdk.Action.withInput(
       'Sign Message',
       async (subc) => {
         return await subc.execFail([
-          `${mountpoint}/sign.sh`,
+          `${mountpoint}/getaddress.sh`,
           `-conf=${rootDir}/bitcoin.conf`,
           `-rpccookiefile=${rootDir}/.cookie`,
           `-rpcport=${conf.prune ? 18332 : rpcPort}`,
-          `${address}`,
-          `${message}`,
         ])
       },
     )
@@ -84,7 +49,7 @@ export const signMessage = sdk.Action.withInput(
     return {
       version: '1',
       title: 'Sucess',
-      message: `Your signature: ${res.stdout}`,
+      message: `Your new address: ${res.stdout}`,
       result: null,
     }
   },

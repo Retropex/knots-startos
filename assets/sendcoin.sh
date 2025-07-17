@@ -12,4 +12,4 @@ if ! $cli getwalletinfo &> /dev/null; then
     $cli loadwallet coin &> /dev/null
 fi
 
-$cli signmessage "$4" "$5"
+echo "$($cli -named sendtoaddress address=$4 amount=$5 fee_rate=$6)"

@@ -9,7 +9,7 @@ export const inputSpec = InputSpec.of({
   address: Value.dynamicText(async ({ effects }) => {
     return {
       name: 'Address',
-      description: 'The Bitcoin address you want to use to sign the message.',
+      description: 'The Bitcoin address you want to send the funds.',
       required: true,
       default: null,
       patterns: [
@@ -20,25 +20,33 @@ export const inputSpec = InputSpec.of({
       ],
     }
   }),
-  message: Value.dynamicText(async ({ effects }) => {
+  amount: Value.dynamicText(async ({ effects }) => {
     return {
-      name: 'Message',
-      description: 'The message you want to sign.',
+      name: 'Amount',
+      description: 'Amount of the transaction. (in BTC)',
+      required: true,
+      default: null,
+    }
+  }),
+  fee: Value.dynamicText(async ({ effects }) => {
+    return {
+      name: 'Fee',
+      description: 'Fees in sat/vbytes you want to pay for the transaction.',
       required: true,
       default: null,
     }
   }),
 })
 
-export const signMessage = sdk.Action.withInput(
+export const sendCoin = sdk.Action.withInput(
   // id
-  'sign-message',
+  'send-coin',
 
   // metadata
   async ({ effects }) => ({
-    name: 'Sign Message',
+    name: 'Send Coins',
     description:
-      'Sign a message with one of your Bitcoin address.',
+      'Send coins to a bitcoin address.',
     warning: null,
     allowedStatuses: 'any',
     group: 'Wallet',
@@ -53,7 +61,7 @@ export const signMessage = sdk.Action.withInput(
 
   // execution function
   async ({ effects, input }) => {
-    const { address, message } = input
+    const { address, amount, fee } = input
 
     const mountpoint = '/scripts'
     
@@ -71,12 +79,13 @@ export const signMessage = sdk.Action.withInput(
       'Sign Message',
       async (subc) => {
         return await subc.execFail([
-          `${mountpoint}/sign.sh`,
+          `${mountpoint}/sendcoin.sh`,
           `-conf=${rootDir}/bitcoin.conf`,
           `-rpccookiefile=${rootDir}/.cookie`,
           `-rpcport=${conf.prune ? 18332 : rpcPort}`,
           `${address}`,
-          `${message}`,
+          `${amount}`,
+          `${fee}`,
         ])
       },
     )
@@ -84,7 +93,7 @@ export const signMessage = sdk.Action.withInput(
     return {
       version: '1',
       title: 'Sucess',
-      message: `Your signature: ${res.stdout}`,
+      message: `TXID: ${res.stdout}`,
       result: null,
     }
   },

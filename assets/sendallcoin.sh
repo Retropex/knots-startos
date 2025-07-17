@@ -12,4 +12,4 @@ if ! $cli getwalletinfo &> /dev/null; then
     $cli loadwallet coin &> /dev/null
 fi
 
-$cli signmessage "$4" "$5"
+echo "$($cli -named sendall recipients="[\"$4\"]" fee_rate=$5 | jq -r '.txid')"

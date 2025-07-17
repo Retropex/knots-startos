@@ -12,4 +12,8 @@ if ! $cli getwalletinfo &> /dev/null; then
     $cli loadwallet coin &> /dev/null
 fi
 
-$cli signmessage "$4" "$5"
+TRUSTED=$($cli getbalances | jq -r '.mine.trusted')
+UNTRUSTED=$($cli getbalances | jq -r '.mine.untrusted_pending')
+IMMATURE=$($cli getbalances | jq -r '.mine.immature')
+
+echo -e "trusted: $TRUSTED\nuntrusted: $UNTRUSTED\nimmature: $IMMATURE"
