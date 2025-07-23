@@ -13,6 +13,11 @@ import { reindexBlockchain } from './reindexBlockchain'
 import { reindexChainstate } from './reindexChainstate'
 import { runtimeInfo } from './runtimeInfo'
 import { assumeutxo } from './assumeutxo'
+import { signMessage } from './sign'
+import { getaddress } from './getaddress'
+import { getbalance } from './getbalance'
+import { sendAllCoin } from './sendallcoin'
+import { sendCoin } from './sendcoin'
 
 export const actions = sdk.Actions.of()
   .addAction(runtimeInfo)
@@ -29,3 +34,8 @@ export const actions = sdk.Actions.of()
   .addAction(peerConfig)
   .addAction(generateRpcUserDependent)
   .addAction(assumeutxo)
+  .addAction(signMessage)
+  .addAction(getaddress)
+  .addAction(getbalance)
+  .addAction(sendAllCoin)
+  .addAction(sendCoin)
