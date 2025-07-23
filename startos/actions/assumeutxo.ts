@@ -125,7 +125,9 @@ export const assumeutxo = sdk.Action.withInput(
         await storeJson.merge(effects, { snapshotInUse: true })
       } catch (e) {
         console.log('Error downloading snapshot:\n', e)
-        await sdk.action.createOwnTask(effects, assumeutxo, 'important')
+        await sdk.action.createOwnTask(effects, assumeutxo, 'important', {
+          reason: 'Previous attempt to download Snapshot failed.',
+        })
       } finally {
         await assumeutxoSubc.destroy()
         assumeutxoSubc = null
