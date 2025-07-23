@@ -1,6 +1,7 @@
 #!/bin/sh
 
 set -e
+set -o pipefail
 
 cli="bitcoin-cli $1 $2 $3"
 
@@ -12,4 +13,4 @@ if ! $cli getwalletinfo &> /dev/null; then
     $cli loadwallet coin &> /dev/null
 fi
 
-echo "$($cli -named sendall recipients="[\"$4\"]" fee_rate=$5 | jq -r '.txid')"
+$cli -named sendall recipients="[\"$4\"]" fee_rate=$5 | jq -r '.txid'
