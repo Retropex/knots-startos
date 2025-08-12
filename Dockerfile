@@ -1,88 +1,62 @@
-# From https://github.com/ruimarinho/docker-bitcoin-core
+FROM debian:bookworm-20230904-slim AS bitcoin-knots
+ENV DEBIAN_FRONTEND=noninteractive
+RUN \
+  --mount=type=cache,target=/var/cache/apt,sharing=locked \
+  --mount=type=cache,target=/var/lib/apt,sharing=locked \
+  --mount=type=bind,source=./repro-sources-list.sh,target=/usr/local/bin/repro-sources-list.sh \
+  repro-sources-list.sh && \
+  apt-get update && \
+  apt-get install -y gpg wget curl jq && \
+  : "Clean up for improving reproducibility (optional)" && \
+  rm -rf /var/log/* /var/cache/ldconfig/aux-cache
 
-# Build stage for BerkeleyDB
 ARG ARCH
 ARG PLATFORM=${ARCH/aarch64/arm64}
 ARG PLATFORM=${PLATFORM/x86_64/amd64}
+ARG VERSION=28.1.knots20250305
+ARG TARGETPLATFORM
+ARG SOURCE_DATE_EPOCH
 
-FROM lncm/berkeleydb:db-4.8.30.NC-${PLATFORM} AS berkeleydb
+WORKDIR /build
 
-# Build stage for Bitcoin Core
-FROM alpine:3.21 AS bitcoin-core
+RUN echo "Deriving tarball name from \$TARGETPLATFORM" && \
+  case "${TARGETPLATFORM}" in \
+    "linux/amd64")  echo "bitcoin-${VERSION}-x86_64-linux-gnu.tar.gz"    > /tarball-name ;; \
+    "linux/arm64")  echo "bitcoin-${VERSION}-aarch64-linux-gnu.tar.gz"   > /tarball-name ;; \
+    *) echo "Unsupported platform: ${TARGETPLATFORM}" && exit 1 ;; \
+  esac && \
+  echo "Tarball name: $(cat /tarball-name)"
 
-COPY --from=berkeleydb /opt /opt
+RUN echo "Downloading release assets"
+RUN wget --no-use-server-timestamps https://bitcoinknots.org/files/28.x/28.1.knots20250305/$(cat /tarball-name)
+RUN wget --no-use-server-timestamps https://bitcoinknots.org/files/28.x/28.1.knots20250305/SHA256SUMS
 
-RUN sed -i 's/http\:\/\/dl-cdn.alpinelinux.org/https\:\/\/alpine.global.ssl.fastly.net/g' /etc/apk/repositories
-RUN apk --no-cache add \
-  autoconf \
-  automake \
-  boost-dev \
-  build-base \
-  clang \
-  chrpath \
-  file \
-  gnupg \
-  libevent-dev \
-  libressl \
-  libtool \
-  linux-headers \
-  sqlite-dev \
-  zeromq-dev
+COPY ./gpg-keys.txt /build/
+COPY ./SHA256SUMS.asc /build/
 
-ADD ./bitcoin /bitcoin
+RUN echo "Verifying PGP signatures"
+RUN gpg --import gpg-keys.txt
+RUN gpg --verify SHA256SUMS.asc SHA256SUMS
+RUN echo "PGP signature verification passed"
 
-ENV BITCOIN_PREFIX=/opt/bitcoin
+RUN echo "Verifying checksums"
+RUN [ -f SHA256SUMS ] && cp SHA256SUMS /sha256sums
+RUN grep $(cat /tarball-name) /sha256sums | sha256sum -c
+RUN echo "Checksums verified ok"
 
-WORKDIR /bitcoin
+RUN echo "Extracting release assets"
+RUN tar -zxvf $(cat /tarball-name) --strip-components=1
 
-RUN ./autogen.sh
-RUN ./configure LDFLAGS=-L`ls -d /opt/db*`/lib/ CPPFLAGS=-I`ls -d /opt/db*`/include/ \
-  # If building on Mac make sure to increase Docker VM memory, or uncomment this line. See https://github.com/bitcoin/bitcoin/issues/6658 for more info.
-  # CXXFLAGS="--param ggc-min-expand=1 --param ggc-min-heapsize=32768" \
-  CXXFLAGS="-O1" \
-  CXX=clang++ CC=clang \
-  --prefix=${BITCOIN_PREFIX} \
-  --disable-man \
-  --disable-tests \
-  --disable-bench \
-  --disable-ccache \
-  --with-gui=no \
-  --with-utils \
-  --with-libs \
-  --with-sqlite=yes \
-  --with-daemon
-RUN make -j$(nproc)
-RUN make install
-RUN strip ${BITCOIN_PREFIX}/bin/*
-RUN strip ${BITCOIN_PREFIX}/lib/libbitcoinconsensus.a
-RUN strip ${BITCOIN_PREFIX}/lib/libbitcoinconsensus.so.0.0.0
-
-# Build stage for compiled artifacts
-FROM alpine:3.21
-
-LABEL maintainer.0="João Fonseca (@joaopaulofonseca)" \
-  maintainer.1="Pedro Branco (@pedrobranco)" \
-  maintainer.2="Rui Marinho (@ruimarinho)" \
-  maintainer.3="Aiden McClelland (@dr-bonez)"
-
-RUN sed -i 's/http\:\/\/dl-cdn.alpinelinux.org/https\:\/\/alpine.global.ssl.fastly.net/g' /etc/apk/repositories
-RUN apk --no-cache add \
-  bash \
-  curl \
-  libevent \
-  libzmq \
-  sqlite-dev \
-  tini \
-  yq \
-  jq \
-RUN rm -rf /var/cache/apk/*
+FROM debian:bookworm-slim@sha256:2424c1850714a4d94666ec928e24d86de958646737b1d113f5b2207be44d37d8
 
 ARG ARCH
+ARG VERSION=28.1.knots20250305
+ARG SOURCE_DATE_EPOCH
 
 ENV BITCOIN_DATA=/root/.bitcoin
 ENV BITCOIN_PREFIX=/opt/bitcoin
 ENV PATH=${BITCOIN_PREFIX}/bin:$PATH
 
-COPY --from=bitcoin-core /opt /opt
+COPY --from=bitcoin-knots /build/bin /opt/bitcoin/bin
 
 EXPOSE 8332 8333
