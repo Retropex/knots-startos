@@ -1,4 +1,7 @@
 import { setupManifest } from '@start9labs/start-sdk'
+import { execSync } from 'child_process'
+
+const SOURCE_DATE_EPOCH = execSync('git show -s --format=%ct HEAD').toString().trim()
 
 export const manifest = setupManifest({
   id: 'bitcoind',
@@ -22,6 +25,9 @@ export const manifest = setupManifest({
         dockerBuild: {
           workdir: './',
           dockerfile: 'Dockerfile',
+          buildArgs: {
+            SOURCE_DATE_EPOCH: SOURCE_DATE_EPOCH,
+          }
         },
       },
     },
