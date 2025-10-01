@@ -21,6 +21,7 @@ const {
   maxuploadtarget,
   blockreconstructionextratxn,
   blockreconstructionextratxnsize,
+  uaspoof
 } = bitcoinConfDefaults
 
 const { InputSpec, Value } = sdk
@@ -222,6 +223,12 @@ const configSpec = sdk.InputSpec.of({
     units: 'MiB',
     placeholder: '0',
   }),
+  uaspoof: Value.text({
+    name: 'User Agent Spoof',
+    description: 'User agent to advertise in the network.',
+    required: false,
+    default: uaspoof,
+  }),
 })
 
 export const otherConfig = sdk.Action.withInput(
@@ -290,6 +297,7 @@ async function read(effects: any): Promise<PartialConfigSpec> {
     },
     natpmp: bitcoinConf.natpmp,
     maxuploadtarget: bitcoinConf.maxuploadtarget,
+    uaspoof: bitcoinConf.uaspoof,
   }
 }
 

@@ -91,6 +91,7 @@ const {
   peerblockfilters,
   natpmp,
   maxuploadtarget,
+  uaspoof
 } = bitcoinConfDefaults
 
 export const shape = object({
@@ -185,6 +186,7 @@ export const shape = object({
   blockreconstructionextratxnsize: natural
     .optional()
     .onMismatch(blockreconstructionextratxnsize),
+  uaspoof: string.optional().onMismatch(uaspoof),
 
   // Wallet
   disablewallet: boolean.onMismatch(disablewallet),

@@ -2,17 +2,17 @@ import { setupManifest } from '@start9labs/start-sdk'
 
 export const manifest = setupManifest({
   id: 'bitcoind',
-  title: 'Bitcoin Knots',
+  title: 'Garbage Man',
   license: 'MIT',
   donationUrl: null,
   wrapperRepo: 'https://github.com/Retropex/knots-startos',
-  upstreamRepo: 'https://github.com/bitcoinknots/bitcoin',
+  upstreamRepo: 'https://github.com/Retropex/bitcoin',
   supportSite: 'https://github.com/Retropex/knots-startos/issues',
   marketingSite: 'https://bitcoinknots.org/',
   docsUrl:
     'https://github.com/Retropex/knots-startos/blob/next/docs/instructions.md',
   description: {
-    short: 'A Bitcoin Full Node by Bitcoin Knots',
+    short: 'A Bitcoin Full Node by Bitcoin Knots (Garbage Man)',
     long: 'Take control of your digital sovereignty by choosing Bitcoin Knots to run your node! With Bitcoin Knots enhanced configuration options, you can fine-tune your node to help keep the network clean and resilient, actively reducing unnecessary load from spam or parasitic transactions.',
   },
   volumes: ['main'],
