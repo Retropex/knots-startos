@@ -39,7 +39,7 @@ export const getConfig: T.ExpectedExports.getConfig = async (effects) => {
           name: "Datacarrier Size",
           description:
             "Maximum size of arbitrary data to relay and mine | Pleb hint: The maximum size of JPEGs and other data you want to relay/mine.",
-          range: "[0,100000]",
+          range: "[0,83]",
           integral: true,
           units: "bytes",
           default: 83,

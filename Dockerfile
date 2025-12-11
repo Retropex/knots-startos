@@ -1,8 +1,8 @@
 # Build stage for BerkeleyDB
-FROM lncm/berkeleydb as berkeleydb
+FROM lncm/berkeleydb AS berkeleydb
 
 # Build stage for Bitcoin Knots
-FROM alpine:3.21 as bitcoin-knots
+FROM alpine:3.21 AS bitcoin-knots
 
 COPY --from=berkeleydb /opt /opt
 
@@ -23,7 +23,8 @@ RUN apk --no-cache add \
         sqlite-dev \
         zeromq-dev \
         bash \
-        curl
+        curl \
+        git
 
 ADD ./bitcoin /bitcoin
 

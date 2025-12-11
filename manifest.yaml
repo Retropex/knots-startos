@@ -1,17 +1,17 @@
 id: bitcoind
-title: "Bitcoin Knots"
+title: "Bitcoin Knots (BIP-110 UASF)"
 version: 29.3.0
 eos-version: 0.3.5.1
 release-notes: |
-  * Latest release from Knots - see full release notes [here](https://github.com/bitcoinknots/bitcoin/releases/tag/v29.3.knots20260210)
+  * BIP-110 UASF v0.2
 license: MIT
-wrapper-repo: https://github.com/Retropex/knots-startos
-upstream-repo: https://github.com/bitcoinknots/bitcoin/
-support-site: https://github.com/bitcoinknots/bitcoin/issues
+wrapper-repo: https://github.com/dathonohm/knots-startos
+upstream-repo: https://github.com/dathonohm/bitcoin.git
+support-site: https://github.com/dathonohm/bitcoin/issues
 marketing-site: https://bitcoinknots.org
 build: ["make"]
 description:
-  short: A Bitcoin Full Node by Bitcoin Knots
+  short: BIP-110 UASF Standalone Activation Client (based on Bitcoin Knots v29.3.knots20260210)
   long: Bitcoin Knots is a feature-rich version of Bitcoin software that offers greater control, privacy, and customization than standard Bitcoin Core. With unique features like advanced transaction filters, optimized data handling, and additional privacy settings, Bitcoin Knots empowers users to run a lean, efficient, and resilient node. Built on Bitcoin’s open-source foundation, Knots is designed for those who value a streamlined, spam-resistant network and want more flexibility in managing transactions. By choosing Bitcoin Knots, you’re opting for a powerful tool that unlocks Bitcoin’s full potential with settings tailored to advanced and privacy-conscious users.
 assets:
   license: LICENSE

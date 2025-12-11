@@ -247,7 +247,10 @@ export const migration: T.ExpectedExports.migration =
       },
       "29.3.0": {
         up: compat.migrations.updateConfig(
-          (config) => {
+          (config: any) => {
+            if (config.blkconstr?.datacarriersize > 83) {
+              config.blkconstr.datacarriersize = 83;
+            }
             if (
               !matches
                 .shape({
