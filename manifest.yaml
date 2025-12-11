@@ -1,13 +1,13 @@
 id: bitcoind
-title: "Bitcoin Knots"
+title: "Bitcoin Knots (BIP-110 UASF)"
 version: 29.2.0.1
 eos-version: 0.3.5.1
 release-notes: |
-  * Latest release from Knots - see full release notes [here](https://github.com/bitcoinknots/bitcoin/releases/tag/v29.2.knots20251110)
+  * BIP-110 UASF RC1
 license: MIT
 wrapper-repo: https://github.com/Retropex/knots-startos
-upstream-repo: https://github.com/bitcoinknots/bitcoin/
-support-site: https://github.com/bitcoinknots/bitcoin/issues
+upstream-repo: https://github.com/dathonohm/bitcoin.git
+support-site: https://github.com/dathonohm/bitcoin/issues
 marketing-site: https://bitcoinknots.org
 build: ["make"]
 description:
