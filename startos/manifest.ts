@@ -8,11 +8,11 @@ const arch =
 
 export const manifest = setupManifest({
   id: 'bitcoind',
-  title: 'Bitcoin Knots',
+  title: 'Bitcoin Knots (BIP 110 UASF)',
   license: 'MIT',
   donationUrl: null,
   wrapperRepo: 'https://github.com/Retropex/knots-startos',
-  upstreamRepo: 'https://github.com/bitcoinknots/bitcoin',
+  upstreamRepo: 'https://github.com/dathonohm/bitcoin',
   supportSite: 'https://github.com/Retropex/knots-startos/issues',
   marketingSite: 'https://bitcoinknots.org/',
   docsUrl: 'https://github.com/Retropex/knots-startos/blob/next/docs/instructions.md',
