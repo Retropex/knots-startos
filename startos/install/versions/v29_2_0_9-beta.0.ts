@@ -1,16 +1,16 @@
 import { VersionInfo, IMPOSSIBLE } from '@start9labs/start-sdk'
 import { bitcoinConfFile } from '../../fileModels/bitcoin.conf'
 import { bitcoinConfDefaults } from '../../utils'
-import { coreCurrent as corev29_2_0_2 } from 'bitcoind-startos/startos/install/versions'
-import { knotsCurrent as knotsv29_2_0_8} from 'bitcoind-knots/startos/install/versions'
+import { v29_2_0_2 } from 'bitcoind-startos/startos/install/versions/v29.2.0_2-beta.3'
+import { v29_2_0_9} from 'bitcoind-knots/startos/install/versions/v29_2_0_9-beta.0'
 import { storeJson } from '../../fileModels/store.json'
 import { sdk } from '../../sdk'
 import { mainMounts } from '../../main'
 import { doesNotThrow } from 'assert'
 const { whitebind, bind } = bitcoinConfDefaults
 
-export const v29_2_0_8 = VersionInfo.of({
-  version: '#knotsrdts:29.2:8-beta.0',
+export const v29_2_0_9rdts = VersionInfo.of({
+  version: '#knotsrdts:29.2:9-beta.0',
   releaseNotes: 'Revamped for StartOS 0.4.0',
   migrations: {
     up: async ({ effects }) => {
@@ -50,7 +50,7 @@ export const v29_2_0_8 = VersionInfo.of({
     },
     down: IMPOSSIBLE,
     other: {
-      [knotsv29_2_0_8.options.version]: {
+      [v29_2_0_9.options.version]: {
         up: async () => {},
         down: async () => {},
       }
