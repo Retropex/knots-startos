@@ -8,8 +8,8 @@ import { sdk } from '../../sdk'
 import { mainMounts } from '../../main'
 const { whitebind, bind } = bitcoinConfDefaults
 
-export const v29_1_0_B6 = VersionInfo.of({
-  version: '#garbageman:29.1:6-beta.6',
+export const v29_1_0_B7 = VersionInfo.of({
+  version: '#garbageman:29.1:7-beta.7',
   releaseNotes: 'Revamped for StartOS 0.4.0',
   migrations: {
       up: async ({ effects }) => {
@@ -41,6 +41,7 @@ export const v29_1_0_B6 = VersionInfo.of({
             bind,
             whitebind,
             whitelist: undefined,
+            uaspoof: '/Satoshi:29.1.0/',
           })
           return
         } // Only write conf defaults if no existing bitcoin.conf found

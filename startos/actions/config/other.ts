@@ -338,6 +338,7 @@ async function write(effects: T.Effects, input: ConfigSpec) {
     maxuploadtarget: input.maxuploadtarget
       ? input.maxuploadtarget
       : maxuploadtarget,
+    uaspoof: input.uaspoof ? input.uaspoof : uaspoof,
   }
 
   await bitcoinConfFile.merge(effects, otherConfig)
