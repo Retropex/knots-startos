@@ -9,8 +9,8 @@ import { mainMounts } from '../../main'
 import { doesNotThrow } from 'assert'
 const { whitebind, bind } = bitcoinConfDefaults
 
-export const v29_2_0_9rdts = VersionInfo.of({
-  version: '#knotsrdts:29.2:9-beta.0',
+export const v29_2_0_10rdts = VersionInfo.of({
+  version: '#knotsrdts:29.2:10-beta.0',
   releaseNotes: 'Revamped for StartOS 0.4.0',
   migrations: {
     up: async ({ effects }) => {
