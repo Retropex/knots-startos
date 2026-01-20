@@ -13,7 +13,7 @@ export const runtimeInfo = sdk.Action.withoutInput(
   async ({ effects }) => ({
     name: 'Runtime Information',
     description:
-      'Network and other runtime information about this Bitcoin node',
+      'Network and other runtime information about this Bitcoin node.',
     warning: null,
     allowedStatuses: 'only-running',
     group: null,
