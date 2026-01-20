@@ -12,7 +12,7 @@ export const getbalance = sdk.Action.withoutInput(
   async ({ effects }) => ({
     name: 'Get Balance',
     description:
-      'Get the balance of your bitcoin wallet.',
+      'Get the balance of your Bitcoin wallet.',
     warning: null,
     allowedStatuses: 'any',
     group: 'Wallet',

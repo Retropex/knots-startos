@@ -46,7 +46,7 @@ export const sendCoin = sdk.Action.withInput(
   async ({ effects }) => ({
     name: 'Send Coins',
     description:
-      'Send coins to a bitcoin address.',
+      'Send coins to a Bitcoin address.',
     warning: null,
     allowedStatuses: 'any',
     group: 'Wallet',
