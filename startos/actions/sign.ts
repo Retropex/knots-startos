@@ -38,7 +38,7 @@ export const signMessage = sdk.Action.withInput(
   async ({ effects }) => ({
     name: 'Sign Message',
     description:
-      'Sign a message with one of your Bitcoin address.',
+      'Sign a message with one of your Bitcoin addresses.',
     warning: null,
     allowedStatuses: 'any',
     group: 'Wallet',
