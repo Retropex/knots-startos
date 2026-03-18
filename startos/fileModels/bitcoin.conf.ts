@@ -157,7 +157,7 @@ export const shape = z
         z.string().transform(Number),
         z.number(),
       ])
-      .transform((v) => (v < minPrune ? minPrune : v))
+      .transform((v) => (v !== 0 && v < minPrune ? minPrune : v))
       .optional()
       .catch(undefined),
     coinstatsindex: iniBoolean,
@@ -196,7 +196,7 @@ function stringifyPrimitives(a: unknown): any {
 
 const { InputSpec, Value, Variants, List } = sdk
 
-const diskUsage = utils.once(() => diskusage.check('/'))
+export const diskUsage = utils.once(() => diskusage.check('/'))
 export const archivalMin = 900_000_000_000
 
 // Override defaults (diverging from upstream Bitcoin Knots)
@@ -637,7 +637,7 @@ export const fullConfigSpec = sdk.InputSpec.of({
       default: disk.total < archivalMin ? minPrune : null,
       integer: true,
       units: 'MiB',
-      min: minPrune,
+      min: 0,
       max: Math.floor((disk.total * 0.75) / (1024 * 1024)),
     }
   }),

@@ -1,10 +1,8 @@
 import { IMPOSSIBLE, VersionInfo } from '@start9labs/start-sdk'
 import { v_28_3_5_b1 } from 'bitcoin-core-startos/startos/install/versions/v28.3.5.b1'
 import { v_29_3_5_b1 } from 'bitcoin-core-startos/startos/install/versions/v29.3.5.b1'
-import { v_30_2_5_b1 } from 'bitcoin-core-startos/startos/install/versions/v30.2.5.b1'
+import { v_30_2_5_b2 } from 'bitcoin-core-startos/startos/install/versions/v30.2.5.b2'
 import { bitcoinConfFile } from '../../fileModels/bitcoin.conf'
-import { i2pdConfFile } from '../../fileModels/i2pd.conf'
-import { storeJson } from '../../fileModels/store.json'
 /**
  * Reset all mempool settings to undefined so the new flavor's upstream
  * defaults take effect. This is the primary reason users switch between
@@ -45,21 +43,13 @@ const mempoolReset = {
   minrelaymaturity: undefined,
 }
 
-export const v29_3_1_b5 = VersionInfo.of({
-  version: '#knots:29.3:1-beta.5',
+export const v29_3_1_b6 = VersionInfo.of({
+  version: '#knots:29.3:1-beta.6',
   releaseNotes: {
-    en_US: 'Update to the latest SDK',
-    es_ES: 'Actualizar al SDK más reciente',
-    de_DE: 'Aktualisieren Sie auf das neueste SDK.',
-    pl_PL: 'Aktualizacja do najnowszego zestawu SDK',
-    fr_FR: 'Met à jour le SDK vers sa dernière version.',
+    en_US: 'Fix pruning bug: archival nodes no longer auto-switch to pruning',
   },
   migrations: {
-    up: async ({ effects }) => {
-      await storeJson.merge(effects, {})
-      await i2pdConfFile.merge(effects, {})
-      await bitcoinConfFile.merge(effects, {})
-    },
+    up: async ({ effects }) => {},
     down: IMPOSSIBLE,
     other: {
       [v_28_3_5_b1.options.version]: {
@@ -82,7 +72,7 @@ export const v29_3_1_b5 = VersionInfo.of({
           await bitcoinConfFile.merge(effects, mempoolReset)
         },
       },
-      [v_30_2_5_b1.options.version]: {
+      [v_30_2_5_b2.options.version]: {
         // Core → Knots
         up: async ({ effects }) => {
           await bitcoinConfFile.merge(effects, mempoolReset)
