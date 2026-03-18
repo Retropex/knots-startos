@@ -3,6 +3,8 @@ import { v_28_3_5_b1 } from 'bitcoin-core-startos/startos/install/versions/v28.3
 import { v_29_3_5_b1 } from 'bitcoin-core-startos/startos/install/versions/v29.3.5.b1'
 import { v_30_2_5_b1 } from 'bitcoin-core-startos/startos/install/versions/v30.2.5.b1'
 import { bitcoinConfFile } from '../../fileModels/bitcoin.conf'
+import { i2pdConfFile } from '../../fileModels/i2pd.conf'
+import { storeJson } from '../../fileModels/store.json'
 /**
  * Reset all mempool settings to undefined so the new flavor's upstream
  * defaults take effect. This is the primary reason users switch between
@@ -43,8 +45,8 @@ const mempoolReset = {
   minrelaymaturity: undefined,
 }
 
-export const v29_3_1_b4 = VersionInfo.of({
-  version: '#knots:29.3:1-beta.4',
+export const v29_3_1_b5 = VersionInfo.of({
+  version: '#knots:29.3:1-beta.5',
   releaseNotes: {
     en_US: 'Update to the latest SDK',
     es_ES: 'Actualizar al SDK más reciente',
@@ -53,7 +55,11 @@ export const v29_3_1_b4 = VersionInfo.of({
     fr_FR: 'Met à jour le SDK vers sa dernière version.',
   },
   migrations: {
-    up: async () => {},
+    up: async ({ effects }) => {
+      await storeJson.merge(effects, {})
+      await i2pdConfFile.merge(effects, {})
+      await bitcoinConfFile.merge(effects, {})
+    },
     down: IMPOSSIBLE,
     other: {
       [v_28_3_5_b1.options.version]: {
