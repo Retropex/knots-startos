@@ -170,16 +170,6 @@ export const main = sdk.setupMain(async ({ effects }) => {
         fn: async () => {
           try {
             await access(`${bitcoindSub.rootfs}${rpcCookiePath}`)
-            const res = await bitcoindSub.exec(getBlockchainInfo)
-            return res.exitCode === 0
-              ? {
-                  message: i18n('The Bitcoin RPC Interface is ready'),
-                  result: 'success',
-                }
-              : {
-                  message: i18n('The Bitcoin RPC Interface is not ready'),
-                  result: 'starting',
-                }
           } catch {
             console.log('Waiting for cookie to be created')
             return {
@@ -187,6 +177,15 @@ export const main = sdk.setupMain(async ({ effects }) => {
               result: 'starting',
             }
           }
+
+          return sdk.healthCheck.checkPortListening(
+            effects,
+            bitcoinConf.prune ? rpcPortPruned : rpcPort,
+            {
+              successMessage: i18n('The Bitcoin RPC Interface is ready'),
+              errorMessage: i18n('The Bitcoin RPC Interface is not ready'),
+            },
+          )
         },
       },
       requires: ['nocow'],
@@ -237,8 +236,8 @@ export const main = sdk.setupMain(async ({ effects }) => {
               fullySynced: true,
               snapshotInUse: false,
             })
-            // Reduce dbcache after initial sync to free RAM
-            await bitcoinConfFile.merge(effects, { dbcache: 450 })
+            // Reduce dbcache and dbbatchsize after initial sync to free RAM
+            await bitcoinConfFile.merge(effects, { dbcache: undefined, dbbatchsize: undefined })
           }
 
           return null
