@@ -7,7 +7,7 @@
 > **Upstream docs:** <https://bitcoinknots.org/>
 >
 > Everything not listed in this document should behave the same as upstream
-> Bitcoin Knots v29.3. If a feature, setting, or behavior is not mentioned
+> Bitcoin Knots. If a feature, setting, or behavior is not mentioned
 > here, the upstream documentation is accurate and fully applicable.
 
 An enhanced Bitcoin full node implementation with additional policy controls for mempool filtering and spam prevention. See the [upstream repo](https://github.com/bitcoinknots/bitcoin) for general Bitcoin Knots documentation.
@@ -40,7 +40,7 @@ This package shares the `bitcoind` package ID with [Bitcoin Core](https://github
 
 | Property      | Value                                                                        |
 | ------------- | ---------------------------------------------------------------------------- |
-| Image         | Custom Dockerfile (multi-stage Alpine build from Bitcoin Knots v29.3 source) |
+| Image         | Custom Dockerfile (multi-stage Alpine build from Bitcoin Knots source)       |
 | Architectures | x86_64, aarch64, riscv64                                                     |
 | Entrypoint    | `bitcoind`                                                                   |
 
@@ -51,8 +51,8 @@ Three additional containers are used:
 | Container | Image                              | Purpose                                       |
 | --------- | ---------------------------------- | --------------------------------------------- |
 | `proxy`   | `ghcr.io/start9labs/btc-rpc-proxy` | RPC proxy for pruned nodes                    |
-| `python`  | `python:3.13.11-alpine`            | Runs `rpcauth.py` to generate RPC credentials |
-| `i2pd`    | `purplei2p/i2pd:release-2.58.0`    | Embedded I2P daemon (when enabled)            |
+| `python`  | `python` (Alpine)                  | Runs `rpcauth.py` to generate RPC credentials |
+| `i2pd`    | `purplei2p/i2pd`                   | Embedded I2P daemon (when enabled)            |
 
 ## Volume and Data Layout
 
@@ -205,7 +205,7 @@ This is transparent to dependent services — port 8332 always serves RPC.
 
 | Check              | Method                                                  | Messages                                                                            |
 | ------------------ | ------------------------------------------------------- | ----------------------------------------------------------------------------------- |
-| **RPC**            | Waits for `.cookie` file, then port listening            | Ready: "The Bitcoin RPC Interface is ready"                                         |
+| **RPC**            | Waits for `.cookie` file, then `bitcoin-cli uptime`      | Ready: "The Bitcoin RPC Interface is ready"                                         |
 | **Blockchain Sync**| `bitcoin-cli getblockchaininfo`                         | Shows percentage during IBD; "Bitcoin is fully synced" when complete                |
 | **I2P**            | I2PControl API status check                             | Ready/not ready based on I2P daemon state                                           |
 | **Tor**            | Tor proxy reachability                                  | Ready when Tor connection is available                                              |
@@ -295,13 +295,12 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for build instructions and development wo
 
 ```yaml
 package_id: bitcoind
-upstream_version: '29.3'
 flavor: knots
-image: custom Dockerfile (built from Bitcoin Knots v29.3 source)
+image: custom Dockerfile (built from Bitcoin Knots source)
 additional_images:
   - ghcr.io/start9labs/btc-rpc-proxy (pruned node RPC proxy)
-  - python:3.13.11-alpine (RPC credential generation)
-  - purplei2p/i2pd:release-2.58.0 (embedded I2P)
+  - python (Alpine, RPC credential generation)
+  - purplei2p/i2pd (embedded I2P)
 architectures: [x86_64, aarch64, riscv64]
 volumes:
   main: /root/.bitcoin
@@ -340,7 +339,7 @@ actions:
   - restore-wallet
   - remove-wallet
 health_checks:
-  - rpc: port_listening (after .cookie file exists)
+  - rpc: bitcoin-cli_uptime (after .cookie file exists)
   - sync-progress: bitcoin-cli_getblockchaininfo
   - i2p: i2pcontrol_api / status
   - tor: proxy reachability

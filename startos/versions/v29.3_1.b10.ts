@@ -1,7 +1,7 @@
 import { IMPOSSIBLE, VersionInfo } from '@start9labs/start-sdk'
-import { v_28_3_5_b5 } from 'bitcoin-core-startos/startos/versions/v28.3.5.b5'
-import { v_29_3_5_b5 } from 'bitcoin-core-startos/startos/versions/v29.3.5.b5'
-import { v_30_2_5_b5 } from 'bitcoin-core-startos/startos/versions/v30.2.5.b5'
+import { v_28_3_5_b6 } from 'bitcoin-core-startos/startos/versions/v28.3.5.b6'
+import { v_29_3_5_b6 } from 'bitcoin-core-startos/startos/versions/v29.3.5.b6'
+import { v_30_2_5_b6 } from 'bitcoin-core-startos/startos/versions/v30.2.5.b6'
 import { bitcoinConfFile } from '../fileModels/bitcoin.conf'
 /**
  * Reset all mempool settings to undefined so the new flavor's upstream
@@ -43,8 +43,8 @@ const mempoolReset = {
   minrelaymaturity: undefined,
 }
 
-export const v29_3_1_b9 = VersionInfo.of({
-  version: '#knots:29.3:1-beta.9',
+export const v29_3_1_b10 = VersionInfo.of({
+  version: '#knots:29.3:1-beta.10',
   releaseNotes: {
     en_US: 'Multiple bug fixes',
   },
@@ -52,7 +52,7 @@ export const v29_3_1_b9 = VersionInfo.of({
     up: async ({ effects }) => {},
     down: IMPOSSIBLE,
     other: {
-      [v_28_3_5_b5.options.version]: {
+      [v_28_3_5_b6.options.version]: {
         // Core → Knots
         up: async ({ effects }) => {
           await bitcoinConfFile.merge(effects, mempoolReset)
@@ -62,7 +62,7 @@ export const v29_3_1_b9 = VersionInfo.of({
           await bitcoinConfFile.merge(effects, mempoolReset)
         },
       },
-      [v_29_3_5_b5.options.version]: {
+      [v_29_3_5_b6.options.version]: {
         // Core → Knots: reset mempool so Knots upstream defaults apply
         up: async ({ effects }) => {
           await bitcoinConfFile.merge(effects, mempoolReset)
@@ -72,7 +72,7 @@ export const v29_3_1_b9 = VersionInfo.of({
           await bitcoinConfFile.merge(effects, mempoolReset)
         },
       },
-      [v_30_2_5_b5.options.version]: {
+      [v_30_2_5_b6.options.version]: {
         // Core → Knots
         up: async ({ effects }) => {
           await bitcoinConfFile.merge(effects, mempoolReset)
@@ -84,4 +84,4 @@ export const v29_3_1_b9 = VersionInfo.of({
       },
     },
   },
-}).satisfies(v_29_3_5_b5.options.version)
+}).satisfies(v_29_3_5_b6.options.version)
