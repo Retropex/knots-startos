@@ -153,7 +153,7 @@ export const main = sdk.setupMain(async ({ effects }) => {
   const base = sdk.Daemons.of(effects).addOneshot('nocow', {
     subcontainer: bitcoindSub,
     exec: {
-      command: ['chattr', '-R', '+C', '/.bitcoin'],
+      command: ['chattr', '-R', '+C', rootDir],
     },
     requires: [],
   })
