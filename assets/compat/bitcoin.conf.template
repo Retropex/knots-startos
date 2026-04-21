@@ -308,6 +308,9 @@ blockmaxweight={{advanced.templateconstruction.blockmaxweight}}
 ## SOFTWAREEXPIRY
 softwareexpiry={{softwareexpiry}}
 
+## CONSENSUSRULES
+consensusrules={{consensusrules}}
+
 
 ## NATPMP
 {{#IF advanced.natpmp

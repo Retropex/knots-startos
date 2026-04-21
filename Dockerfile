@@ -61,7 +61,8 @@ RUN . /tmp/bdb_prefix.sh && \
   -DBUILD_DAEMON=ON \
   -DENABLE_HARDENING=ON \
   -DREDUCE_EXPORTS=ON \
-  -DWITH_ZMQ=ON
+  -DWITH_ZMQ=ON \
+  -D RDTS_CONSENT=RUNTIME_CHECK
 RUN cmake --build build -j$(nproc)
 RUN cmake --install build
 RUN strip ${BITCOIN_PREFIX}/bin/*

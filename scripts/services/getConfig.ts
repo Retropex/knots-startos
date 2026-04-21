@@ -4,6 +4,15 @@ import { compat, types as T } from "../dependencies.ts";
 export const getConfig: T.ExpectedExports.getConfig = async (effects) => {
   const allowUnpruned = (await effects.diskUsage()).total > 800_000_000_000;
   return compat.getConfig({
+    consensusrules: {
+      type: "string",
+      nullable: false,
+      name: "Consensus rules",
+      description: "Enforce the specified consensus rules. Must be rdts to use this software. This version of Bitcoin Knots applies the BIP110 (RDTS) network upgrade, which fixes critical vulnerabilities in long-standing network design. To avoid applying this upgrade by accident, this version asks for explicit confirmation. Important: Because this upgrade already has broad community support, skipping this update or reverting to an older software version does not reject it. Running outdated software after any network upgrade only leaves your node vulnerable to displaying fake or fraudulent transactions. To effectively reject this upgrade, you need to run alternative software designed to split away from the upgraded network. Learn more about rdts at https://bitcoinknots.org/learn/2026-rdts",
+      placeholder: "rdts",
+      pattern: '^rdts$',
+      'pattern-description': 'You must use the rdts rules to use this version of Bitcoin Knots, If you are not ready to adopt the RDTS upgrade yet, you can download this same version of Bitcoin Knots without RDTS support from: https://github.com/Retropex/knots-startos/releases/tag/v29.3.knots20260507',
+    },
     "peer-tor-address": {
       name: "Peer Tor Address",
       description: "The Tor address of the peer interface",
