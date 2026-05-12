@@ -41,19 +41,19 @@ const mempoolReset = {
   minrelaymaturity: undefined,
 }
 
-export const v29_3_7 = VersionInfo.of({
-  version: '#knots:29.3:7',
+export const v29_3_8 = VersionInfo.of({
+  version: '#prerdtsknots:29.3:8',
   releaseNotes: {
     en_US:
-      'Wallet actions are now more reliable, use GUIX binaries for bitcoind and bitcoin-cli, use Debian based images. Downgrades from Bitcoin Core v30 or v31 are now handled correctly.',
+      'Update to the latest Bitcoin Knots version, see the release note at https://github.com/bitcoinknots/bitcoin/releases/tag/v29.3.knots20260507',
     es_ES:
-      'Las acciones del monedero son ahora más fiables, use binarios GUIX para bitcoind y bitcoin-cli y utilice imágenes basadas en Debian. Ahora se gestionan correctamente las degradaciones desde Bitcoin Core v30 o v31.',
+      'Actualiza a la última versión de Bitcoin Knots, consulta la nota de versión en https://github.com/bitcoinknots/bitcoin/releases/tag/v29.3.knots20260507',
     de_DE:
-      'Wallet-Aktionen sind jetzt zuverlässiger, verwenden Sie GUIX-Binärdateien für bitcoind und bitcoin-cli sowie Debian-basierte Images. Downgrades von Bitcoin Core v30 oder v31 werden jetzt korrekt verarbeitet.',
+      'Aktualisieren Sie auf die neueste Bitcoin Knots-Version. Siehe die Versionshinweise unter https://github.com/bitcoinknots/bitcoin/releases/tag/v29.3.knots20260507',
     pl_PL:
-      'Operacje portfela są teraz bardziej niezawodne, używaj binariów GUIX dla bitcoind i bitcoin-cli oraz obrazów opartych na Debianie. Obniżenie wersji z Bitcoin Core v30 lub v31 jest teraz poprawnie obsługiwane.',
+      'Zaktualizuj do najnowszej wersji Bitcoin Knots, zobacz notatkę o wydaniu na https://github.com/bitcoinknots/bitcoin/releases/tag/v29.3.knots20260507',
     fr_FR:
-      'Les actions du portefeuille sont désormais plus fiables, utilise les binaires GUIX pour bitcoind et bitcoin-cli, utilise des images basées sur Debian. Les rétrogradations depuis Bitcoin Core v30 ou v31 sont désormais gérées correctement.',
+      'Met à jour vers la dernière version de Bitcoin Knots, consultez la note de version à https://github.com/bitcoinknots/bitcoin/releases/tag/v29.3.knots20260507',
   },
   migrations: {
     up: async ({ effects }) => {},
@@ -118,6 +118,30 @@ export const v29_3_7 = VersionInfo.of({
         // Knots → Core
         down: async ({ effects }) => {
           await bitcoinConfFile.merge(effects, mempoolReset)
+        },
+      },
+      ['#knots:29.3:7']: {
+        up: async ({ effects }) => {
+          // no reset since it's the same implementation
+        },
+        down: async ({ effects }) => {
+          // no reset since it's the same implementation
+        },
+      },
+      ['#knots:29.3:8']: {
+        up: async ({ effects }) => {
+          // no reset since it's the same implementation
+        },
+        down: async ({ effects }) => {
+          // no reset since it's the same implementation
+        },
+      },
+      ['#knotsrdts:29.3:7']: {
+        up: async ({ effects }) => {
+          // no reset since it's the same implementation
+        },
+        down: async ({ effects }) => {
+          // no reset since it's the same implementation
         },
       },
     },
