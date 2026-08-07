@@ -1,9 +1,9 @@
 id: bitcoind
 title: "Bitcoin Knots"
-version: 29.3.1
+version: 29.4.0
 eos-version: 0.3.5.1
 release-notes: |
-  * Latest release from Knots - see full release notes [here](https://github.com/bitcoinknots/bitcoin/releases/tag/v29.3.knots20260508)
+  * Latest release from Knots - see full release notes [here](https://github.com/bitcoinknots/bitcoin/releases/tag/v29.4.knots20260508)
 license: MIT
 wrapper-repo: https://github.com/Retropex/knots-startos
 upstream-repo: https://github.com/bitcoinknots/bitcoin/
