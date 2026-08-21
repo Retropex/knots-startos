@@ -6,7 +6,7 @@ export const manifest = setupManifest({
   title: 'Bitcoin Knots',
   license: 'MIT',
   donationUrl: null,
-  packageRepo: 'https://github.com/Start9Labs/bitcoin-knots-startos/tree/29.x',
+  packageRepo: 'https://github.com/bitcoinknots/bitcoin-knots-startos',
   upstreamRepo: 'https://github.com/bitcoinknots/bitcoin',
   marketingUrl: 'https://bitcoinknots.org/',
   description: { short, long },
@@ -16,7 +16,7 @@ export const manifest = setupManifest({
       source: {
         dockerBuild: {
           buildArgs: {
-            VERSION: '29.4.knots20260508',
+            VERSION: '29.4.1.knots20260508',
             PATH_VERSION: '29.x',
           },
         },

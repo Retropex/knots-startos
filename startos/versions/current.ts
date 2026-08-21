@@ -65,9 +65,7 @@ export const current = VersionInfo.of({
       // `down` — `#knotsrdts` is being de-listed, so the inverse path
       // can't be selected by a user.
       ['^#knotsrdts:29.3']: {
-        up: async ({ effects }) => {
-          await bitcoinConfFile.merge(effects, { consensusrules: 'rdts' })
-        },
+        up: async ({ effects }) => {},
       },
     },
   },

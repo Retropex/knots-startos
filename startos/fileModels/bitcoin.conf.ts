@@ -9,8 +9,6 @@ import {
   peerPortLocal,
   rpcallowip,
   rpcallowipPruned,
-  rpcbind,
-  rpcbindPruned,
   rpccookiefile,
   zmqBundle,
 } from '../utils'
@@ -57,16 +55,12 @@ type ValidNets = z.infer<typeof onlyNetOption>
 export const shape = z
   .object({
     // RPC enforced
-    rpcbind: z.enum([rpcbind, rpcbindPruned]).catch(rpcbind),
     rpcallowip: z.enum([rpcallowip, rpcallowipPruned]).catch(rpcallowip),
     rpcuser: z.undefined().optional().catch(undefined),
     rpcpassword: z.undefined().optional().catch(undefined),
     rpccookiefile: z.literal(rpccookiefile).catch(rpccookiefile),
     // Peers enforced
     listen: z.literal(true).catch(true),
-    bind: z
-      .union([z.array(z.string()).transform((a) => a.at(-1)!), z.string()])
-      .catch(`0.0.0.0:${peerPortInternal}`),
     whitebind: z
       .literal(`0.0.0.0:${peerPortLocal}`)
       .catch(`0.0.0.0:${peerPortLocal}`),
@@ -164,6 +158,7 @@ export const shape = z
 
     // Other
     softwareexpiry: iniNumber,
+    blake2b_headline: iniString,
     blocknotify: iniString,
     prune: z
       .union([
@@ -190,7 +185,6 @@ export const shape = z
       .catch(undefined),
     peerblockfilters: iniBoolean,
     natpmp: iniBoolean,
-    consensusrules: z.literal('rdts').optional().catch(undefined),
     maxuploadtarget: iniNumber,
   })
   .loose()
@@ -518,7 +512,6 @@ export const fullConfigSpec = sdk.InputSpec.of({
   }),
 
   // === OTHER ===
-  consensusrules: Value.hidden(z.literal('rdts').optional().catch(undefined)),
   softwareexpiry: Value.number({
     name: i18n('Software Expiry'),
     description: i18n(
@@ -528,6 +521,13 @@ export const fullConfigSpec = sdk.InputSpec.of({
     required: true,
     integer: true,
     units: i18n('timestamp'),
+  }),
+  blake2b_headline: Value.text({
+    name: 'BLAKE2b headline',
+    description: 'Specify consensus-critical proof-of-time news headline',
+    required: true,
+    default: null,
+    warning: 'MUST BE SET TO EXACT CORRECT STRING',
   }),
   zmqEnabled: Value.triState({
     name: i18n('ZeroMQ Enabled'),
@@ -945,8 +945,8 @@ function fileToForm(
     zmqpubrawtx,
     zmqpubsequence,
     // Other
-    consensusrules,
     softwareexpiry,
+    blake2b_headline,
     txindex,
     coinstatsindex,
     disablewallet,
@@ -1014,8 +1014,8 @@ function fileToForm(
     minrelaymaturity,
 
     // Other - with transforms
-    consensusrules,
     softwareexpiry,
+    blake2b_headline,
     zmqEnabled: !!(
       zmqpubhashblock &&
       zmqpubhashtx &&
@@ -1119,8 +1119,8 @@ function formToFile(
     minrelaycoinblocks,
     minrelaymaturity,
     // Other
-    consensusrules,
     softwareexpiry,
+    blake2b_headline,
     prune,
     wallet,
     txindex,
@@ -1153,7 +1153,6 @@ function formToFile(
     // Enforced fields
     rpccookiefile: '.cookie',
     listen: true,
-    bind: `0.0.0.0:${peerPortInternal}`,
     whitebind: `0.0.0.0:${peerPortLocal}`,
     deprecatedrpc: 'create_bdb',
     rpcauth: raw?.rpcauth?.filter((a) => !!a) as string[] | undefined,
@@ -1161,7 +1160,6 @@ function formToFile(
     externalip: raw?.externalip?.filter((a) => !!a) as string[] | undefined,
 
     // RPC (prune-derived)
-    rpcbind: prune ? rpcbindPruned : rpcbind,
     rpcallowip: prune ? rpcallowipPruned : rpcallowip,
 
     // Mempool - 1:1 pass-through
@@ -1203,8 +1201,8 @@ function formToFile(
     discardfee: wallet?.discardfee ?? undefined,
 
     // Other
-    consensusrules,
     softwareexpiry,
+    blake2b_headline,
     txindex: prune ? false : (txindex ?? undefined),
     coinstatsindex: coinstatsindex ?? undefined,
     peerbloomfilters: peerbloomfilters ?? undefined,
