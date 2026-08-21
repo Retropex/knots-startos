@@ -16,12 +16,11 @@
 
 ## Getting set up
 
-Bitcoin Knots starts and begins Initial Block Download (IBD) immediately on install. A single critical task asks you to acknowledge the BIP-110 (RDTS) consensus rules this version will eventually enforce; resolve it from the Dashboard.
+Bitcoin Knots starts and begins Initial Block Download (IBD) immediately on install.
 
 1. Start the service. Open the Dashboard and watch the sync progress.
-2. Resolve the **Activate RDTS** critical task by acknowledging that this version will eventually enforce the BIP-110 (Reduced Data Temporary Softfork) consensus rules. If you do not want RDTS, install the **Bitcoin Knots (pre-RDTS)** flavor from the marketplace instead — it ships the same Knots release without RDTS.
-3. If you want inbound clearnet peers, add a public IP or hostname on the **Peer Interface**. If you want inbound Tor peers, add a `.onion` there.
-4. If you want to expose RPC to a wallet or dependent service that doesn't use the cookie file, run **Generate RPC User Credentials** and supply the username/password to the consumer.
+2. If you want inbound clearnet peers, add a public IP or hostname on the **Peer Interface**. If you want inbound Tor peers, add a `.onion` there.
+3. If you want to expose RPC to a wallet or dependent service that doesn't use the cookie file, run **Generate RPC User Credentials** and supply the username/password to the consumer.
 
 > Initial Block Download takes hours to days depending on hardware and network. The node is functional immediately but RPC calls that depend on chain state will return partial results until sync completes.
 
