@@ -11,8 +11,8 @@
 - A full Bitcoin Knots node with three interfaces: **RPC Interface** (JSON-RPC for wallets and dependent services), **Peer Interface** (the network port other nodes connect to), and **ZeroMQ Interface** (block/transaction notifications, when ZMQ is enabled).
 - An embedded **i2pd** sidecar that brings up I2P transport automatically — your node accepts inbound peers over I2P out of the box, with a separate **I2P Daemon Console** interface available when you turn the i2pd web console on.
 - An automatic Tor outbound proxy (your node reaches `.onion` peers without configuration); add a `.onion` to the Peer Interface to advertise yourself and accept inbound Tor connections too.
-- Disk-aware defaults: on disks smaller than 900 GB the package enables pruning and disables `txindex`; on larger disks you get a full archival node. The transition is transparent — pruned nodes route RPC through a small `btc-rpc-proxy` sidecar so port 8332 always serves RPC the same way, and it fetches any block your node has pruned from the peer-to-peer network on demand, so wallets and services see a node that behaves as though nothing were pruned.
-- Shared `bitcoind` package id with Bitcoin Core — you can switch flavors without re-syncing the chain, including during an RDTS chain split, when the switch also settles which side your node follows (see [Switching flavors during a chain split](#switching-flavors-during-a-chain-split)).
+- Disk-aware defaults: on disks smaller than 900 GB the package enables pruning and disables `txindex`; on larger disks you get a full archival node. The transition is transparent — pruned nodes route RPC through a small `btc-rpc-proxy` sidecar so port 8332 always serves RPC the same way.
+- Shared `bitcoind` package id with Bitcoin Core — you can switch flavors without re-syncing the chain.
 
 ## Getting set up
 
@@ -65,18 +65,6 @@ Every action above acts on the currently selected wallet, so if you run more tha
 - **Reindex Chainstate** — rebuild chainstate from existing blocks (not available on pruned nodes).
 - **Delete Peer List** — wipe `peers.dat` if peer discovery is misbehaving.
 - **Delete Transaction Index** / **Delete Coinstats Index** — clear a corrupted index so it can be rebuilt.
-
-### Switching flavors during a chain split
-
-Bitcoin Core, Bitcoin Knots, and Bitcoin Knots (pre-RDTS) share your blockchain data, so switching between them keeps the chain you have already synced. They do not all agree on which blocks are valid, though, and your node remembers the verdicts it recorded under the flavor you left. Should the network split over the RDTS upgrade, that memory would leave you following the wrong side — so it is corrected for you at the first start after a switch, and your node may reorganize onto a different chain as a result.
-
-Switching **away** from this version clears the verdicts it recorded under RDTS; you get a **Chain Verdicts Reset** notification if anything was cleared. Switching **to** it re-checks your recent chain against the RDTS rules, which can take anywhere from minutes to many hours — watch the **Blockchain Sync** health check.
-
-Three things to watch for during an actual split:
-
-- **You need peers on the side you want.** Correcting the verdicts lets your node accept that chain; downloading it needs peers who serve it. If your node does not converge, add a trusted node under **Peer Settings → Add Nodes**.
-- **A pruned node may not be able to switch sides.** Reorganizing needs old blocks a pruned node has already discarded. When they are gone you get a **Some Chains Not Recoverable** notification — run **Reindex Blockchain**, which on a pruned node re-downloads the whole chain. A pruned node also cannot reorganize further back than its retained window (at least the most recent 288 blocks), so a split older than roughly two days may leave that full re-download as the only way across.
-- **Check your dependent services afterward.** A reorg during a split can be deep, and Lightning (LND, Core Lightning) is not safe against arbitrarily deep reorgs: one past a channel's funding depth can force-close channels.
 
 ### Advanced
 

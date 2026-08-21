@@ -428,15 +428,6 @@ const dict = {
   'This version of Bitcoin Knots will eventually enforce the BIP-110 Reduced Data Temporary Softfork ("RDTS") network upgrade, which fixes critical vulnerabilities in long-standing network design. To avoid applying this upgrade by accident, this version asks for explicit confirmation. Important: because this upgrade already has broad community support, skipping this update or reverting to an older software version does not reject it. Running outdated software after any network upgrade may leave your node vulnerable to displaying fake or fraudulent transactions. To effectively reject this upgrade, you need to run alternative software designed to split away from the upgraded network. Learn more at https://bitcoinknots.org/learn/2026-rdts. If you are not ready to adopt the RDTS upgrade, you can alternatively switch to the "Bitcoin Knots (pre-RDTS)" version available in the Start9 marketplace, which is the same version of Bitcoin Knots without RDTS support.': 3004,
   'Please acknowledge': 3005,
   'Please confirm your understanding that this version of Bitcoin Knots will eventually enforce the BIP-110 Reduced Data Temporary Softfork (RDTS) consensus rules.': 3007,
-
-  // Chain Recovery: forkRecovery.ts, main.ts chain-recovery oneshot
-  // (3200 block — 31xx is used by the pre-RDTS flavor's own strings)
-  'Chain Verdicts Reset': 3226,
-  "Cleared invalid-block verdicts inherited from the previously installed bitcoind flavor on ${count} chain tip(s). The node now follows the best chain that is valid under this flavor's rules; reorganizing onto it may take a while and requires peers on that chain.": 3227,
-  'Some Chains Not Recoverable': 3228,
-  '${count} invalid chain branch(es) inherited from the previous bitcoind flavor could not be reconsidered: this pruned node no longer stores the blocks needed to reorganize onto them. If the node appears stuck on the wrong chain, run Reindex Blockchain (on a pruned node this re-downloads the chain).': 3229,
-  'Chain Recovery Failed': 3230,
-  'Clearing invalid-block verdicts inherited from the previous bitcoind flavor failed; it will be retried at the next restart. Error: ${error}': 3231,
 } as const
 
 /**

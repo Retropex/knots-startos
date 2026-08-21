@@ -5,7 +5,6 @@ import { socksHostId, socksPort } from 'tor-startos/startos/utils'
 import { bitcoinConfFile } from './fileModels/bitcoin.conf'
 import { i2pdConfFile } from './fileModels/i2pd.conf'
 import { storeJson } from './fileModels/store.json'
-import { isRdtsEnforcing, reconsiderInvalidTips } from './forkRecovery'
 import { i18n } from './i18n'
 import { sdk } from './sdk'
 import {
@@ -271,102 +270,6 @@ export const main = sdk.setupMain(async ({ effects }) => {
         },
       },
       requires: ['sync-progress'],
-    })
-    /**
-     * Chain-split recovery (see forkRecovery.ts). Records the durable
-     * rdtsEnforcedLastRun marker each start — the signal the non-enforcing
-     * flavors read after a switch away from here — and consumes the
-     * reconsider flag set by cross-flavor migrations. Runs once per start as
-     * soon as RPC answers; nothing depends on it, so it never blocks the
-     * service.
-     */
-    .addOneshot('chain-recovery', {
-      subcontainer: null,
-      exec: {
-        fn: async () => {
-          const prune = !!bitcoinConf.prune
-
-          // Ground truth from the running binary: enforcing ⇔ the
-          // reduced_data deployment is enabled. The shipped RUNTIME_WARN
-          // build enforces regardless of `consensusrules`, so config is not
-          // a valid proxy (see forkRecovery.ts).
-          const enforcing = await isRdtsEnforcing(bitcoindSub, { prune })
-
-          // Materialize an enforcement-regime transition into the durable
-          // recovery flag BEFORE updating the marker, so a crash between the
-          // writes re-detects the transition instead of losing it. An UNKNOWN
-          // marker (legacy datadir — e.g. one last advanced by a published
-          // package version that predates the marker) is treated as "the
-          // previous binary may have differed" and reconsiders (a free no-op
-          // when there are no invalid tips). The marker itself is the load-
-          // bearing write for this flavor: it is what tells Core and pre-RDTS
-          // Knots, on the next switch away from here, that the verdicts they
-          // inherit were produced under RDTS. The in-memory `store` mirrors
-          // every merge so a bitcoind health-flap re-running this oneshot
-          // within one main run doesn't repeat completed work.
-          let wantReconsider = store.reconsiderInvalidTips
-          if (!enforcing && store.rdtsEnforcedLastRun !== false) {
-            wantReconsider = true
-            store.reconsiderInvalidTips = true
-            await storeJson.merge(effects, { reconsiderInvalidTips: true })
-          }
-          if (store.rdtsEnforcedLastRun !== enforcing) {
-            store.rdtsEnforcedLastRun = enforcing
-            await storeJson.merge(effects, { rdtsEnforcedLastRun: enforcing })
-          }
-
-          if (wantReconsider) {
-            if (enforcing) {
-              // Stale: queued when this datadir last left an enforcing
-              // flavor, but enforcement is active here — this node's
-              // verdicts are authoritative.
-              store.reconsiderInvalidTips = false
-              await storeJson.merge(effects, { reconsiderInvalidTips: false })
-            } else {
-              try {
-                const res = await reconsiderInvalidTips(bitcoindSub, { prune })
-                store.reconsiderInvalidTips = false
-                await storeJson.merge(effects, {
-                  reconsiderInvalidTips: false,
-                })
-                if (res.reconsidered.length) {
-                  await sdk.notification.create(effects, {
-                    level: 'info',
-                    title: i18n('Chain Verdicts Reset'),
-                    message: i18n(
-                      "Cleared invalid-block verdicts inherited from the previously installed bitcoind flavor on ${count} chain tip(s). The node now follows the best chain that is valid under this flavor's rules; reorganizing onto it may take a while and requires peers on that chain.",
-                      { count: String(res.reconsidered.length) },
-                    ),
-                  })
-                }
-                if (res.skippedPruned.length) {
-                  await sdk.notification.create(effects, {
-                    level: 'warning',
-                    title: i18n('Some Chains Not Recoverable'),
-                    message: i18n(
-                      '${count} invalid chain branch(es) inherited from the previous bitcoind flavor could not be reconsidered: this pruned node no longer stores the blocks needed to reorganize onto them. If the node appears stuck on the wrong chain, run Reindex Blockchain (on a pruned node this re-downloads the chain).',
-                      { count: String(res.skippedPruned.length) },
-                    ),
-                  })
-                }
-              } catch (e) {
-                console.error('chain-recovery: reconsider failed', e)
-                await sdk.notification.create(effects, {
-                  level: 'error',
-                  title: i18n('Chain Recovery Failed'),
-                  message: i18n(
-                    'Clearing invalid-block verdicts inherited from the previous bitcoind flavor failed; it will be retried at the next restart. Error: ${error}',
-                    { error: String(e) },
-                  ),
-                })
-              }
-            }
-          }
-
-          return null
-        },
-      },
-      requires: ['bitcoind'],
     })
     // I2P daemon (conditional)
     .addDaemon('i2pd', async () => {

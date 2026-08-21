@@ -398,14 +398,6 @@ export default {
     3004: 'Esta versión de Bitcoin Knots eventualmente aplicará la actualización de red BIP-110 Reduced Data Temporary Softfork ("RDTS"), que corrige vulnerabilidades críticas en el diseño de la red existente. Para evitar aplicar esta actualización por accidente, esta versión solicita una confirmación explícita. Importante: dado que esta actualización ya cuenta con amplio apoyo de la comunidad, omitir esta actualización o volver a una versión anterior del software no la rechaza. Ejecutar software desactualizado después de cualquier actualización de red puede dejar su nodo vulnerable a mostrar transacciones falsas o fraudulentas. Para rechazar efectivamente esta actualización, debe ejecutar un software alternativo diseñado para separarse de la red actualizada. Más información en https://bitcoinknots.org/learn/2026-rdts. Si no está listo para adoptar la actualización RDTS, alternativamente puede cambiar a la versión "Bitcoin Knots (pre-RDTS)" disponible en el marketplace de Start9, que es la misma versión de Bitcoin Knots sin soporte para RDTS.',
     3005: 'Por favor, confirme',
     3007: 'Por favor, confirme su comprensión de que esta versión de Bitcoin Knots eventualmente aplicará las reglas de consenso BIP-110 Reduced Data Temporary Softfork (RDTS).',
-
-    // Chain Recovery (3200 block)
-    3226: 'Veredictos de cadena restablecidos',
-    3227: 'Se borraron los veredictos de bloques inválidos heredados de la variante de bitcoind instalada anteriormente en ${count} punta(s) de cadena. El nodo ahora sigue la mejor cadena válida bajo las reglas de esta variante; reorganizarse hacia ella puede tardar un tiempo y requiere pares en esa cadena.',
-    3228: 'Algunas cadenas no recuperables',
-    3229: '${count} rama(s) de cadena inválida(s) heredada(s) de la variante anterior de bitcoind no pudieron reconsiderarse: este nodo podado ya no almacena los bloques necesarios para reorganizarse hacia ellas. Si el nodo parece atascado en la cadena equivocada, ejecute Reindexar blockchain (en un nodo podado esto vuelve a descargar la cadena).',
-    3230: 'Recuperación de cadena fallida',
-    3231: 'El borrado de los veredictos de bloques inválidos heredados de la variante anterior de bitcoind falló; se reintentará en el próximo reinicio. Error: ${error}',
     2503: 'La cartera ${wallet} se ha respaldado en ${file}',
     2603: 'La cartera ${wallet} se ha restaurado desde ${file}',
     2704: 'No eliminada',
@@ -818,14 +810,6 @@ export default {
     3004: 'Diese Version von Bitcoin Knots wird schließlich das BIP-110 Reduced Data Temporary Softfork ("RDTS") Netzwerk-Upgrade durchsetzen, das kritische Schwachstellen im langjährigen Netzwerkdesign behebt. Um zu vermeiden, dieses Upgrade versehentlich anzuwenden, fordert diese Version eine ausdrückliche Bestätigung an. Wichtig: Da dieses Upgrade bereits breite Unterstützung in der Community hat, lehnt das Überspringen dieses Updates oder das Zurücksetzen auf eine ältere Softwareversion es nicht ab. Das Ausführen veralteter Software nach einem Netzwerk-Upgrade kann Ihren Knoten anfällig dafür machen, gefälschte oder betrügerische Transaktionen anzuzeigen. Um dieses Upgrade effektiv abzulehnen, müssen Sie alternative Software ausführen, die darauf ausgelegt ist, sich vom aktualisierten Netzwerk abzuspalten. Erfahren Sie mehr unter https://bitcoinknots.org/learn/2026-rdts. Wenn Sie noch nicht bereit sind, das RDTS-Upgrade zu übernehmen, können Sie alternativ zur Version "Bitcoin Knots (pre-RDTS)" wechseln, die im Start9 Marktplatz verfügbar ist und dieselbe Version von Bitcoin Knots ohne RDTS-Unterstützung darstellt.',
     3005: 'Bitte bestätigen',
     3007: 'Bitte bestätigen Sie Ihr Verständnis, dass diese Version von Bitcoin Knots schließlich die BIP-110 Reduced Data Temporary Softfork (RDTS) Konsensregeln durchsetzen wird.',
-
-    // Chain Recovery (3200 block)
-    3226: 'Chain-Urteile zurückgesetzt',
-    3227: 'Von der zuvor installierten bitcoind-Variante geerbte Ungültigkeits-Urteile auf ${count} Chain-Spitze(n) gelöscht. Der Knoten folgt jetzt der besten Chain, die unter den Regeln dieser Variante gültig ist; die Reorganisation dorthin kann eine Weile dauern und braucht Peers auf dieser Chain.',
-    3228: 'Einige Chains nicht wiederherstellbar',
-    3229: '${count} von der vorherigen bitcoind-Variante geerbte(r) ungültige(r) Chain-Zweig(e) konnten nicht überdacht werden: Dieser beschnittene Knoten speichert die für eine Reorganisation dorthin nötigen Blöcke nicht mehr. Wirkt der Knoten auf der falschen Chain festgefahren, führen Sie „Blockchain neu indizieren" aus (auf einem beschnittenen Knoten lädt dies die Chain neu herunter).',
-    3230: 'Chain-Wiederherstellung fehlgeschlagen',
-    3231: 'Das Löschen der von der vorherigen bitcoind-Variante geerbten Ungültigkeits-Urteile ist fehlgeschlagen; beim nächsten Neustart wird es erneut versucht. Fehler: ${error}',
     2503: 'Wallet ${wallet} wurde nach ${file} gesichert',
     2603: 'Wallet ${wallet} wurde aus ${file} wiederhergestellt',
     2704: 'Nicht entfernt',
@@ -1238,14 +1222,6 @@ export default {
     3004: 'Ta wersja Bitcoin Knots ostatecznie wymusi aktualizację sieci BIP-110 Reduced Data Temporary Softfork ("RDTS"), która naprawia krytyczne luki w długotrwałej konstrukcji sieci. Aby uniknąć przypadkowego zastosowania tej aktualizacji, ta wersja prosi o wyraźne potwierdzenie. Ważne: ponieważ ta aktualizacja ma już szerokie poparcie społeczności, pominięcie tej aktualizacji lub powrót do starszej wersji oprogramowania jej nie odrzuca. Uruchamianie nieaktualnego oprogramowania po jakiejkolwiek aktualizacji sieci może pozostawić węzeł podatny na wyświetlanie fałszywych lub oszukańczych transakcji. Aby skutecznie odrzucić tę aktualizację, musisz uruchomić alternatywne oprogramowanie zaprojektowane do oddzielenia się od zaktualizowanej sieci. Dowiedz się więcej na https://bitcoinknots.org/learn/2026-rdts. Jeśli nie jesteś gotowy do przyjęcia aktualizacji RDTS, możesz alternatywnie przełączyć się na wersję "Bitcoin Knots (pre-RDTS)" dostępną w marketplace Start9, który jest tą samą wersją Bitcoin Knots bez obsługi RDTS.',
     3005: 'Proszę potwierdzić',
     3007: 'Proszę potwierdzić zrozumienie, że ta wersja Bitcoin Knots ostatecznie wymusi zasady konsensusu BIP-110 Reduced Data Temporary Softfork (RDTS).',
-
-    // Chain Recovery (3200 block)
-    3226: 'Werdykty łańcucha zresetowane',
-    3227: 'Wyczyszczono werdykty nieważności bloków odziedziczone po poprzednio zainstalowanym wariancie bitcoind na ${count} wierzchołku(ach) łańcucha. Węzeł podąża teraz za najlepszym łańcuchem ważnym według reguł tego wariantu; reorganizacja może chwilę potrwać i wymaga peerów na tym łańcuchu.',
-    3228: 'Niektóre łańcuchy nie do odzyskania',
-    3229: '${count} nieważna(e) gałąź(zie) łańcucha odziedziczona(e) po poprzednim wariancie bitcoind nie mogły zostać ponownie rozważone: ten przycięty węzeł nie przechowuje już bloków potrzebnych do reorganizacji na nie. Jeśli węzeł wydaje się utknięty na niewłaściwym łańcuchu, uruchom „Przeindeksuj blockchain" (na przyciętym węźle oznacza to ponowne pobranie łańcucha).',
-    3230: 'Odzyskiwanie łańcucha nie powiodło się',
-    3231: 'Czyszczenie werdyktów nieważności bloków odziedziczonych po poprzednim wariancie bitcoind nie powiodło się; próba zostanie ponowiona przy następnym restarcie. Błąd: ${error}',
     2503: 'Portfel ${wallet} został zarchiwizowany do ${file}',
     2603: 'Portfel ${wallet} został przywrócony z ${file}',
     2704: 'Nie usunięto',
@@ -1658,14 +1634,6 @@ export default {
     3004: "Cette version de Bitcoin Knots finira par appliquer la mise à niveau réseau BIP-110 Reduced Data Temporary Softfork (« RDTS »), qui corrige des vulnérabilités critiques dans la conception réseau existante. Pour éviter d'appliquer cette mise à niveau par accident, cette version demande une confirmation explicite. Important : comme cette mise à niveau bénéficie déjà d'un large soutien communautaire, ignorer cette mise à jour ou revenir à une version antérieure du logiciel ne la rejette pas. Exécuter un logiciel obsolète après toute mise à niveau réseau peut rendre votre nœud vulnérable à l'affichage de transactions fausses ou frauduleuses. Pour rejeter efficacement cette mise à niveau, vous devez exécuter un logiciel alternatif conçu pour se séparer du réseau mis à niveau. En savoir plus sur https://bitcoinknots.org/learn/2026-rdts. Si vous n'êtes pas prêt à adopter la mise à niveau RDTS, vous pouvez basculer vers la version « Bitcoin Knots (pre-RDTS) » disponible sur le marketplace Start9, qui est la même version de Bitcoin Knots sans prise en charge de RDTS.",
     3005: 'Veuillez confirmer',
     3007: 'Veuillez confirmer votre compréhension que cette version de Bitcoin Knots finira par appliquer les règles de consensus BIP-110 Reduced Data Temporary Softfork (RDTS).',
-
-    // Chain Recovery (3200 block)
-    3226: 'Verdicts de chaîne réinitialisés',
-    3227: 'Verdicts de blocs invalides hérités de la variante bitcoind précédemment installée effacés sur ${count} pointe(s) de chaîne. Le nœud suit désormais la meilleure chaîne valide selon les règles de cette variante ; la réorganisation peut prendre un certain temps et nécessite des pairs sur cette chaîne.',
-    3228: 'Certaines chaînes non récupérables',
-    3229: "${count} branche(s) de chaîne invalide(s) héritée(s) de la variante bitcoind précédente n'ont pas pu être reconsidérées : ce nœud élagué ne stocke plus les blocs nécessaires pour se réorganiser vers elles. Si le nœud semble bloqué sur la mauvaise chaîne, exécutez « Réindexer la blockchain » (sur un nœud élagué cela retélécharge la chaîne).",
-    3230: 'Échec de la récupération de chaîne',
-    3231: "L'effacement des verdicts de blocs invalides hérités de la variante bitcoind précédente a échoué ; nouvelle tentative au prochain redémarrage. Erreur : ${error}",
     2503: 'Le portefeuille ${wallet} a été sauvegardé dans ${file}',
     2603: 'Le portefeuille ${wallet} a été restauré depuis ${file}',
     2704: 'Non supprimé',

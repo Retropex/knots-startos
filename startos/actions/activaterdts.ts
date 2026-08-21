@@ -39,8 +39,6 @@ export const activateRDTS = sdk.Action.withInput(
     if (!input.acknowledge) {
       throw new Error(i18n('Please acknowledge'))
     }
-    // Consent record only: the shipped RUNTIME_WARN binary enforces RDTS
-    // regardless of this option (see forkRecovery.ts).
     await bitcoinConfFile.merge(effects, { consensusrules: 'rdts' })
   },
 )

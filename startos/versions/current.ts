@@ -1,7 +1,6 @@
 import { IMPOSSIBLE, VersionInfo } from '@start9labs/start-sdk'
 import { rm } from 'fs/promises'
 import { bitcoinConfFile } from '../fileModels/bitcoin.conf'
-import { storeJson } from '../fileModels/store.json'
 /**
  * Reset all mempool settings to undefined so the new flavor's upstream
  * defaults take effect. This is the primary reason users switch between
@@ -42,23 +41,6 @@ const mempoolReset = {
   minrelaymaturity: undefined,
 }
 
-/**
- * Chain-split recovery flag (see startos/forkRecovery.ts), set on every
- * sidegrade out of this enforcing flavor and consumed by the destination
- * flavor's chain-recovery oneshot at next start (a clean no-op when there is
- * nothing to fix). The shared datadir carries this flavor's persisted
- * per-block verdicts across the switch, so RDTS-driven invalid verdicts must
- * be reconsidered or they pin Core / pre-RDTS Knots to a stale chain across a
- * split. The destination's own rdtsEnforcedLastRun marker detects the same
- * transition independently; setting the flag here makes the switch case
- * deterministic even if a prior run never recorded a marker.
- *
- * The inverse direction needs nothing: the Knots release this flavor pins
- * re-validates the RDTS-applicable range itself when it starts on a datadir
- * that advanced without enforcement.
- */
-const leavingRdtsFlavor = { reconsiderInvalidTips: true }
-
 export const current = VersionInfo.of({
   version: '#knots:29.4:5',
   releaseNotes: {
@@ -89,13 +71,6 @@ export const current = VersionInfo.of({
     // Keyed by Core major series as caret ranges — one entry per Core
     // major, not per Core `:N`. Range-keyed `migrations.other` requires
     // StartOS ≥ 0.4.0-beta.9 (Start9Labs/start-os#3214).
-    //
-    // Intentional asymmetry: there is no `^#knotsprerdts` key for the
-    // pre-RDTS Knots sibling (B). The B↔C migration belt lives on B's own
-    // `^#knots` entry (its `up` edge, C→B, sets reconsiderInvalidTips),
-    // which fires because this flavor satisfies B's `canMigrateTo`; the
-    // runtime rdtsEnforcedLastRun marker double-covers it. Not a gap — no
-    // mirror key.
     other: {
       ['^28']: {
         // Core → Knots
@@ -105,7 +80,6 @@ export const current = VersionInfo.of({
         // Knots → Core
         down: async ({ effects }) => {
           await bitcoinConfFile.merge(effects, mempoolReset)
-          await storeJson.merge(effects, leavingRdtsFlavor)
         },
       },
       ['^29']: {
@@ -116,7 +90,6 @@ export const current = VersionInfo.of({
         // Knots → Core
         down: async ({ effects }) => {
           await bitcoinConfFile.merge(effects, mempoolReset)
-          await storeJson.merge(effects, leavingRdtsFlavor)
         },
       },
       ['^30']: {
@@ -133,7 +106,6 @@ export const current = VersionInfo.of({
         // Knots → Core
         down: async ({ effects }) => {
           await bitcoinConfFile.merge(effects, mempoolReset)
-          await storeJson.merge(effects, leavingRdtsFlavor)
         },
       },
       ['^31']: {
@@ -153,7 +125,6 @@ export const current = VersionInfo.of({
         // Knots → Core
         down: async ({ effects }) => {
           await bitcoinConfFile.merge(effects, mempoolReset)
-          await storeJson.merge(effects, leavingRdtsFlavor)
         },
       },
       // `#knotsrdts` (the "Bitcoin Knots plus BIP-110" build) is being
