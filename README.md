@@ -2,7 +2,7 @@
   <img src="icon.svg" alt="Bitcoin Knots Logo" width="21%">
 </p>
 
-# Bitcoin Knots (RDTS) on StartOS
+# Bitcoin Knots on StartOS
 
 > Everything not listed in this document should behave the same as upstream
 > Bitcoin Knots. If a feature, setting, or behavior is not mentioned here, the

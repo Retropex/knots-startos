@@ -1,10 +1,10 @@
-# Bitcoin Knots (RDTS)
+# Bitcoin Knots
 
 ## Documentation
 
 - [Start9 Bitcoin guides](https://docs.start9.com/bitcoin-guides/) — operating-a-Bitcoin-node guides curated for StartOS users (connecting wallets, dependent services, common workflows).
 - [About Bitcoin Knots](https://bitcoinknots.org/#about) — upstream project's description of how Knots differs from Bitcoin Core.
-- [BIP-110 (RDTS) and what it means for your node](https://start9.com/bip110/) — Start9's guidance on the chain this version follows, written after the August 2026 split.
+- [About BIP-110 / RDTS](https://bip110.org) — background on the Reduced Data Temporary Softfork network upgrade this version will eventually enforce.
 
 ## What you get on StartOS
 
@@ -12,14 +12,14 @@
 - An embedded **i2pd** sidecar that brings up I2P transport automatically — your node accepts inbound peers over I2P out of the box, with a separate **I2P Daemon Console** interface available when you turn the i2pd web console on.
 - An automatic Tor outbound proxy (your node reaches `.onion` peers without configuration); add a `.onion` to the Peer Interface to advertise yourself and accept inbound Tor connections too.
 - Disk-aware defaults: on disks smaller than 900 GB the package enables pruning and disables `txindex`; on larger disks you get a full archival node. The transition is transparent — pruned nodes route RPC through a small `btc-rpc-proxy` sidecar so port 8332 always serves RPC the same way, and it fetches any block your node has pruned from the peer-to-peer network on demand, so wallets and services see a node that behaves as though nothing were pruned.
-- Shared `bitcoind` package id with Bitcoin Core — you can switch flavors without re-syncing the chain. Since the RDTS split, the switch also settles which of the two chains your node follows (see [Switching flavors during a chain split](#switching-flavors-during-a-chain-split)).
+- Shared `bitcoind` package id with Bitcoin Core — you can switch flavors without re-syncing the chain, including during an RDTS chain split, when the switch also settles which side your node follows (see [Switching flavors during a chain split](#switching-flavors-during-a-chain-split)).
 
 ## Getting set up
 
-Bitcoin Knots starts and begins Initial Block Download (IBD) immediately on install. A single critical task asks you to confirm that you are opting into the RDTS chain — a different blockchain and network from the one Bitcoin Core and Bitcoin Knots (pre-RDTS) follow; resolve it from the Dashboard.
+Bitcoin Knots starts and begins Initial Block Download (IBD) immediately on install. A single critical task asks you to acknowledge the BIP-110 (RDTS) consensus rules this version will eventually enforce; resolve it from the Dashboard.
 
 1. Start the service. Open the Dashboard and watch the sync progress.
-2. Resolve the **RDTS Chain Opt-In** critical task. It sets out what you are agreeing to: BIP-110 did not carry the network, so this version follows a chain of its own that currently produces a block only about once every day or two, a hard fork to a new proof-of-work algorithm is planned for 1 September 2026 to restore normal block production, and the two chains share no replay protection. To stay on the chain the rest of the network follows, install **Bitcoin Core** or the **Bitcoin Knots (pre-RDTS)** flavor from the marketplace instead.
+2. Resolve the **Activate RDTS** critical task by acknowledging that this version will eventually enforce the BIP-110 (Reduced Data Temporary Softfork) consensus rules. If you do not want RDTS, install the **Bitcoin Knots (pre-RDTS)** flavor from the marketplace instead — it ships the same Knots release without RDTS.
 3. If you want inbound clearnet peers, add a public IP or hostname on the **Peer Interface**. If you want inbound Tor peers, add a `.onion` there.
 4. If you want to expose RPC to a wallet or dependent service that doesn't use the cookie file, run **Generate RPC User Credentials** and supply the username/password to the consumer.
 
@@ -68,7 +68,7 @@ Every action above acts on the currently selected wallet, so if you run more tha
 
 ### Switching flavors during a chain split
 
-Bitcoin Core, Bitcoin Knots, and Bitcoin Knots (pre-RDTS) share your blockchain data, so switching between them keeps the chain you have already synced. They do not all agree on which blocks are valid, though, and your node remembers the verdicts it recorded under the flavor you left. The network has split over the RDTS upgrade, so that memory would leave you following the wrong side — it is corrected for you at the first start after a switch, and your node may reorganize onto a different chain as a result.
+Bitcoin Core, Bitcoin Knots, and Bitcoin Knots (pre-RDTS) share your blockchain data, so switching between them keeps the chain you have already synced. They do not all agree on which blocks are valid, though, and your node remembers the verdicts it recorded under the flavor you left. Should the network split over the RDTS upgrade, that memory would leave you following the wrong side — so it is corrected for you at the first start after a switch, and your node may reorganize onto a different chain as a result.
 
 Switching **away** from this version clears the verdicts it recorded under RDTS; you get a **Chain Verdicts Reset** notification if anything was cleared. Switching **to** it re-checks your recent chain against the RDTS rules, which can take anywhere from minutes to many hours — watch the **Blockchain Sync** health check.
 

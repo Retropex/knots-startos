@@ -18,11 +18,6 @@ export const shape = z
      *  flavors read it to recognize inherited RDTS verdicts as foreign
      *  (undefined = legacy datadir, treated as unknown → reconsider). */
     rdtsEnforcedLastRun: z.boolean().optional().catch(undefined),
-    /** Whether the user has opted this node into the RDTS chain (the
-     *  `activate-rdts` critical task). Deliberately not declared by the
-     *  other flavors, whose shapes `.strip()` it: switching away and back
-     *  is a fresh opt-in to a separate network and re-prompts. */
-    rdtsAcknowledged: z.boolean().catch(false),
     fullySynced: z.boolean().catch(false),
     snapshotInUse: z.boolean().catch(false),
     /** Wallet that the Wallet-group Actions operate on. Defaults to the

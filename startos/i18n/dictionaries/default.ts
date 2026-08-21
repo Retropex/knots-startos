@@ -422,12 +422,12 @@ const dict = {
   'Reduce bandwidth by not relaying transactions. Blocks will still be downloaded and validated normally. Disables the mempool, wallet transaction broadcasting, and fee estimation.': 2913,
   Default: 2914,
 
-  // actions/activaterdts.ts + init/rdtsOptIn.ts
+  // actions/activaterdts.ts + init/consensusrules.ts
   'I acknowledge': 3000,
-  'RDTS Chain Opt-In': 3002,
-  'The BIP-110 Reduced Data Temporary Softfork ("RDTS") did not carry the Bitcoin network. In August 2026, at block 961,632, the nodes enforcing it split onto a chain of their own, and this version of Bitcoin Knots follows that chain. Installing it, or switching to it from Bitcoin Core or Bitcoin Knots (pre-RDTS), is not an update: it moves your node onto a different blockchain and a different network. Two consequences to weigh before you accept. First, the RDTS chain barely moves. It kept Bitcoin\'s mining difficulty but attracted a tiny fraction of its hashpower, so a block arrives roughly once every day or two. Your node will look healthy while standing still — deposits will not confirm, and services that depend on it, Lightning among them, will stall. A hard fork to a new proof-of-work algorithm is planned for 1 September 2026 to restore normal block production; until then, expect the chain to crawl. Second, the two chains share no replay protection: a transaction you broadcast on one can be replayed on the other and spend the same coins there. To follow the chain the rest of the Bitcoin network follows, use Bitcoin Core or Bitcoin Knots (pre-RDTS) instead, both in the Start9 marketplace. Start9\'s guidance is at https://start9.com/bip110/.': 3004,
+  'Activate RDTS': 3002,
+  'This version of Bitcoin Knots will eventually enforce the BIP-110 Reduced Data Temporary Softfork ("RDTS") network upgrade, which fixes critical vulnerabilities in long-standing network design. To avoid applying this upgrade by accident, this version asks for explicit confirmation. Important: because this upgrade already has broad community support, skipping this update or reverting to an older software version does not reject it. Running outdated software after any network upgrade may leave your node vulnerable to displaying fake or fraudulent transactions. To effectively reject this upgrade, you need to run alternative software designed to split away from the upgraded network. Learn more at https://bitcoinknots.org/learn/2026-rdts. If you are not ready to adopt the RDTS upgrade, you can alternatively switch to the "Bitcoin Knots (pre-RDTS)" version available in the Start9 marketplace, which is the same version of Bitcoin Knots without RDTS support.': 3004,
   'Please acknowledge': 3005,
-  'Confirm that you understand this version follows the RDTS chain — a separate blockchain from the one Bitcoin Core and Bitcoin Knots (pre-RDTS) follow, on which blocks currently arrive about once every day or two.': 3007,
+  'Please confirm your understanding that this version of Bitcoin Knots will eventually enforce the BIP-110 Reduced Data Temporary Softfork (RDTS) consensus rules.': 3007,
 
   // Chain Recovery: forkRecovery.ts, main.ts chain-recovery oneshot
   // (3200 block — 31xx is used by the pre-RDTS flavor's own strings)

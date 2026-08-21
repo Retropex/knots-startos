@@ -59,16 +59,6 @@ const mempoolReset = {
  */
 const leavingRdtsFlavor = { reconsiderInvalidTips: true }
 
-/**
- * `consensusrules=rdts` acknowledges the upgrade to the binary and nothing
- * else: the RUNTIME_WARN build enforces RDTS with or without it, and only
- * warns when it is missing. The package sets it on arrival and clears it on
- * departure — no other flavor understands the key — but never enforces it, so
- * a user who would rather see the warning can delete it and it stays deleted.
- */
-const setConsensusRules = { raw: { consensusrules: 'rdts' as const } }
-const clearConsensusRules = { raw: { consensusrules: undefined } }
-
 export const current = VersionInfo.of({
   version: '#knots:29.4:5',
   releaseNotes: {
@@ -94,9 +84,7 @@ export const current = VersionInfo.of({
 - Une valeur non numérique saisie à la main dans l'un des réglages numériques de bitcoin.conf est désormais ignorée au profit de la valeur par défaut de ce réglage. Elle était auparavant réécrite dans le fichier sous la forme NaN, que Bitcoin lit comme 0 — pour Connexions maximales, un nœud qui n'établit ni n'accepte aucune connexion avec des pairs.`,
   },
   migrations: {
-    up: async ({ effects }) => {
-      await bitcoinConfFile.merge(effects, setConsensusRules)
-    },
+    up: async ({ effects }) => {},
     down: IMPOSSIBLE,
     // Keyed by Core major series as caret ranges — one entry per Core
     // major, not per Core `:N`. Range-keyed `migrations.other` requires
@@ -112,34 +100,22 @@ export const current = VersionInfo.of({
       ['^28']: {
         // Core → Knots
         up: async ({ effects }) => {
-          await bitcoinConfFile.merge(effects, {
-            ...mempoolReset,
-            ...setConsensusRules,
-          })
+          await bitcoinConfFile.merge(effects, mempoolReset)
         },
         // Knots → Core
         down: async ({ effects }) => {
-          await bitcoinConfFile.merge(effects, {
-            ...mempoolReset,
-            ...clearConsensusRules,
-          })
+          await bitcoinConfFile.merge(effects, mempoolReset)
           await storeJson.merge(effects, leavingRdtsFlavor)
         },
       },
       ['^29']: {
         // Core → Knots
         up: async ({ effects }) => {
-          await bitcoinConfFile.merge(effects, {
-            ...mempoolReset,
-            ...setConsensusRules,
-          })
+          await bitcoinConfFile.merge(effects, mempoolReset)
         },
         // Knots → Core
         down: async ({ effects }) => {
-          await bitcoinConfFile.merge(effects, {
-            ...mempoolReset,
-            ...clearConsensusRules,
-          })
+          await bitcoinConfFile.merge(effects, mempoolReset)
           await storeJson.merge(effects, leavingRdtsFlavor)
         },
       },
@@ -148,10 +124,7 @@ export const current = VersionInfo.of({
         // path; Knots 29 only reads the old indexes/coinstats/ path, which
         // Core 30 deliberately preserved for downgrade.
         up: async ({ effects }) => {
-          await bitcoinConfFile.merge(effects, {
-            ...mempoolReset,
-            ...setConsensusRules,
-          })
+          await bitcoinConfFile.merge(effects, mempoolReset)
           await rm('/media/startos/volumes/main/indexes/coinstatsindex', {
             recursive: true,
             force: true,
@@ -159,10 +132,7 @@ export const current = VersionInfo.of({
         },
         // Knots → Core
         down: async ({ effects }) => {
-          await bitcoinConfFile.merge(effects, {
-            ...mempoolReset,
-            ...clearConsensusRules,
-          })
+          await bitcoinConfFile.merge(effects, mempoolReset)
           await storeJson.merge(effects, leavingRdtsFlavor)
         },
       },
@@ -171,10 +141,7 @@ export const current = VersionInfo.of({
         // CURRENT_FEES_FILE_VERSION 149900 → 309900; ≤30 hard-fails) and
         // coinstatsindex (same reason as 30.x).
         up: async ({ effects }) => {
-          await bitcoinConfFile.merge(effects, {
-            ...mempoolReset,
-            ...setConsensusRules,
-          })
+          await bitcoinConfFile.merge(effects, mempoolReset)
           await rm('/media/startos/volumes/main/fee_estimates.dat', {
             force: true,
           }).catch(console.error)
@@ -185,22 +152,18 @@ export const current = VersionInfo.of({
         },
         // Knots → Core
         down: async ({ effects }) => {
-          await bitcoinConfFile.merge(effects, {
-            ...mempoolReset,
-            ...clearConsensusRules,
-          })
+          await bitcoinConfFile.merge(effects, mempoolReset)
           await storeJson.merge(effects, leavingRdtsFlavor)
         },
       },
       // `#knotsrdts` (the "Bitcoin Knots plus BIP-110" build) is being
-      // retired. Users on it can move here; nothing carries over. The
-      // acceptance that build recorded predates the split, so arrival
-      // re-prompts under the current terms — as it does from every other
-      // flavor. No `down` — `#knotsrdts` is being de-listed, so the inverse
-      // path can't be selected by a user.
+      // retired. Users on it can move here; preserve their RDTS acceptance
+      // so the consensusrules critical-task gate doesn't re-fire. No
+      // `down` — `#knotsrdts` is being de-listed, so the inverse path
+      // can't be selected by a user.
       ['^#knotsrdts:29.3']: {
         up: async ({ effects }) => {
-          await bitcoinConfFile.merge(effects, setConsensusRules)
+          await bitcoinConfFile.merge(effects, { consensusrules: 'rdts' })
         },
       },
     },

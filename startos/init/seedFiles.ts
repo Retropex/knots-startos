@@ -30,9 +30,6 @@ export const seedFiles = sdk.setupOnInit(async (effects, kind) => {
       prune: (await diskUsage()).total < archivalMin ? minPrune : 0,
       raw: {
         i2psam: i2PSamAddress,
-        // Acknowledges RDTS to the binary, which otherwise warns on every
-        // start. Not enforced — see versions/current.ts.
-        consensusrules: 'rdts',
       },
     })
   } else {

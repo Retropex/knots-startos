@@ -31,8 +31,8 @@ import { GetBlockchainInfo, bitcoinCliArgs } from './utils'
  * running *binary*, not of configuration. The RDTS-enforcing flavor pins an
  * official Knots release built with RDTS_CONSENT=RUNTIME_WARN
  * (contrib/guix/libexec/build.sh), which enforces on mainnet from its first
- * start regardless of `consensusrules` — that option only silences the
- * binary's consent warning, it does not gate enforcement. Bitcoin
+ * start regardless of `consensusrules` — that option records user consent
+ * (and silences an hourly warning), it does not gate enforcement. Bitcoin
  * Core and pre-RDTS Knots binaries never enforce. Callers therefore derive
  * enforcement from the node itself via isRdtsEnforcing (never-enforcing
  * flavors may hardcode false), and every flavor's main.ts records it in the
@@ -109,13 +109,12 @@ const cliJson = async <T>(
  * the RUNTIME_WARN Knots release, which enforces on mainnet from first start —
  * and absent on builds that never define it (Bitcoin Core; the pre-RDTS Knots
  * release that predates the deployment). Presence is thus a valid enforcement
- * signal for the RDTS build and does NOT depend on `consensusrules` (this
- * package sets that option to silence the binary's warning; it does not gate
- * enforcement and records nothing about user intent). Never-enforcing
- * flavors MUST hardcode false — they cannot derive it. Keying on presence,
- * never the deployment's `active` field, is deliberate: a fresh RDTS-flavor
- * install before the opt-in task is resolved still enforces and must read as
- * such.
+ * signal for the RDTS build and does NOT depend on `consensusrules` (that
+ * option records consent and silences a warning; it does not gate
+ * enforcement). Never-enforcing flavors MUST hardcode false — they cannot
+ * derive it. Keying on presence, never the deployment's `active` field, is
+ * deliberate: a fresh RDTS-flavor install before "Activate RDTS" is
+ * acknowledged still enforces and must read as such.
  */
 export async function isRdtsEnforcing(
   subc: CliRunner,
