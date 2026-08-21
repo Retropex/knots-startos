@@ -95,7 +95,7 @@ export const main = sdk.setupMain(async ({ effects }) => {
     return { cancel: false }
   })
 
-  const bitcoinArgs: string[] = [`-onion=${torSocks}`, '-rpcbind=0.0.0.0:8332', '-bind=0.0.0.0:58333', '-rpccookiefile=/root/.bitcoin/.cookie', '-chain=testnet4']
+  const bitcoinArgs: string[] = [`-onion=${torSocks}`, '-chain=testnet4']
 
   if (reindexBlockchain) {
     bitcoinArgs.push('-reindex')

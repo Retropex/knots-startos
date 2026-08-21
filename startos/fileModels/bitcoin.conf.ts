@@ -58,7 +58,7 @@ export const shape = z
     rpcallowip: z.enum([rpcallowip, rpcallowipPruned]).catch(rpcallowip),
     rpcuser: z.undefined().optional().catch(undefined),
     rpcpassword: z.undefined().optional().catch(undefined),
-    rpccookiefile: z.literal(rpccookiefile).catch(rpccookiefile),
+    rpccookiefile: z.literal('/root/.bitcoin/.cookie').catch('/root/.bitcoin/.cookie'),
     // Peers enforced
     listen: z.literal(true).catch(true),
     whitebind: z
@@ -1151,7 +1151,7 @@ function formToFile(
     ...raw,
 
     // Enforced fields
-    rpccookiefile: '.cookie',
+    rpccookiefile: '/root/.bitcoin/.cookie',
     listen: true,
     whitebind: `0.0.0.0:${peerPortLocal}`,
     deprecatedrpc: 'create_bdb',
@@ -1270,11 +1270,12 @@ export const bitcoinConfFile = FileHelper.ini(
   { bracketedArray: false },
   {
     onRead: (a) => {
-      const base = shape.parse(a)
+      const section = (a as any)?.testnet4 ?? a
+      const base = shape.parse(section)
       return fileToForm(base)
     },
     onWrite: (a) => {
-      return stringifyPrimitives(formToFile(a))
+      return { testnet4: stringifyPrimitives(formToFile(a)) }
     },
   },
 )
