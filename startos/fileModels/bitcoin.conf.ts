@@ -54,16 +54,8 @@ const validNets = ['ipv4', 'ipv6', 'onion', 'i2p'] as const
 const onlyNetOption = z.enum(validNets)
 type ValidNets = z.infer<typeof onlyNetOption>
 
-// Upstream suppresses transaction relay while the tip is older than this, and
-// the RDTS chain produces a block only every day or two. Optional rather than
-// enforced in formToFile: the departure migrations have to be able to strip it,
-// and an enforced field cannot be. Any other value is pinned back to this one.
-export const defaultMaxtipage = 14 * 24 * 60 * 60
-
 export const shape = z
   .object({
-    maxtipage: z.literal(defaultMaxtipage).optional().catch(defaultMaxtipage),
-
     // RPC enforced
     rpcbind: z.enum([rpcbind, rpcbindPruned]).catch(rpcbind),
     rpcallowip: z.enum([rpcallowip, rpcallowipPruned]).catch(rpcallowip),

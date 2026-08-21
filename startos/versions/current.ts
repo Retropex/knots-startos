@@ -67,16 +67,7 @@ const leavingRdtsFlavor = { reconsiderInvalidTips: true }
  * a user who would rather see the warning can delete it and it stays deleted.
  */
 const setConsensusRules = { raw: { consensusrules: 'rdts' as const } }
-
-/**
- * `maxtipage` has no arrival half — the file model pins it — but the flavors
- * we hand off to parse unknown keys through rather than dropping them, so it
- * must be removed here: left behind, a node on their chain would call itself
- * synced up to two weeks late.
- */
-const clearFlavorKeys = {
-  raw: { consensusrules: undefined, maxtipage: undefined },
-}
+const clearConsensusRules = { raw: { consensusrules: undefined } }
 
 export const current = VersionInfo.of({
   version: '#knots:29.4:5',
@@ -103,14 +94,13 @@ export const current = VersionInfo.of({
 - Une valeur non numérique saisie à la main dans l'un des réglages numériques de bitcoin.conf est désormais ignorée au profit de la valeur par défaut de ce réglage. Elle était auparavant réécrite dans le fichier sous la forme NaN, que Bitcoin lit comme 0 — pour Connexions maximales, un nœud qui n'établit ni n'accepte aucune connexion avec des pairs.`,
   },
   migrations: {
-    up: async ({ effects }) => {},
+    up: async ({ effects }) => {
+      await bitcoinConfFile.merge(effects, setConsensusRules)
+    },
     down: IMPOSSIBLE,
     // Keyed by Core major series as caret ranges — one entry per Core
     // major, not per Core `:N`. Range-keyed `migrations.other` requires
     // StartOS ≥ 0.4.0-beta.9 (Start9Labs/start-os#3214).
-    //
-    // Sidegrade edges belong on whichever version is current: without them
-    // this version has no path off the flavor at all.
     //
     // Intentional asymmetry: there is no `^#knotsprerdts` key for the
     // pre-RDTS Knots sibling (B). The B↔C migration belt lives on B's own
@@ -131,7 +121,7 @@ export const current = VersionInfo.of({
         down: async ({ effects }) => {
           await bitcoinConfFile.merge(effects, {
             ...mempoolReset,
-            ...clearFlavorKeys,
+            ...clearConsensusRules,
           })
           await storeJson.merge(effects, leavingRdtsFlavor)
         },
@@ -148,7 +138,7 @@ export const current = VersionInfo.of({
         down: async ({ effects }) => {
           await bitcoinConfFile.merge(effects, {
             ...mempoolReset,
-            ...clearFlavorKeys,
+            ...clearConsensusRules,
           })
           await storeJson.merge(effects, leavingRdtsFlavor)
         },
@@ -171,7 +161,7 @@ export const current = VersionInfo.of({
         down: async ({ effects }) => {
           await bitcoinConfFile.merge(effects, {
             ...mempoolReset,
-            ...clearFlavorKeys,
+            ...clearConsensusRules,
           })
           await storeJson.merge(effects, leavingRdtsFlavor)
         },
@@ -197,7 +187,7 @@ export const current = VersionInfo.of({
         down: async ({ effects }) => {
           await bitcoinConfFile.merge(effects, {
             ...mempoolReset,
-            ...clearFlavorKeys,
+            ...clearConsensusRules,
           })
           await storeJson.merge(effects, leavingRdtsFlavor)
         },

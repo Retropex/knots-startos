@@ -267,56 +267,99 @@ The snapshot task is `important` rather than `critical`, deliberately: a node wi
 
 ## Health Checks
 
-Six checks at most, and three of them can never report a failure: they describe the node's reachability posture rather than its health.
+| Check               | Method                                                                                 | Messages                                                                                       |
+| ------------------- | -------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| **RPC**             | Waits for `.cookie` file, then port-listening check on `8332` (or `58332` when pruned) | Ready: "The Bitcoin RPC Interface is ready"                                                    |
+| **Blockchain Sync** | `bitcoin-cli getblockchaininfo`, plus `getchaintips` when it reports IBD (polled every 30 s; 5 s during startup/failure) | Shows percentage while behind; "Bitcoin is fully synced" when caught up                        |
+| **I2P**             | I2PControl API (auth + router info)                                                    | "Inbound and outbound connections" or "Outbound connections only" based on `i2pacceptincoming` |
+| **Tor**             | Tor install/running status                                                             | "Inbound and outbound" when an onion address is published; otherwise "Outbound only"           |
+| **Clearnet**        | Checks published IP addresses                                                          | "Inbound and outbound" when an IP address is published; otherwise "Outbound only"              |
+| **RPC Proxy**       | Port listening (when pruned)                                                           | Ready: "The Bitcoin RPC Proxy is ready"                                                        |
 
-| Check           | Displayed       | Probes                                                                       | Grace       | Present                                    |
-| --------------- | --------------- | ---------------------------------------------------------------------------- | ----------- | ------------------------------------------ |
-| `bitcoind`      | RPC             | Waits for `.cookie` to appear, then that the RPC port is listening           | SDK default | always                                     |
-| `sync-progress` | Blockchain Sync | `getblockchaininfo` plus `getchaintips`, every 30 s (5 s while starting or failing)              | —           | always                                     |
-| `i2pd`          | I2P             | i2pd's I2PControl `RouterInfo` on loopback                                   | 5 minutes   | while I2P is enabled                       |
-| `i2p`           | I2P             | nothing — a `disabled` placeholder in place of the daemon check              | —           | while I2P is off, or excluded by `onlynet` |
-| `tor`           | Tor             | Tor's installed and running state, and whether an onion address is published | —           | always                                     |
-| `clearnet`      | Clearnet        | Whether a non-onion address is published                                     | —           | always                                     |
-| `proxy`         | RPC Proxy       | That the proxy's port is listening                                           | —           | while the node is pruned                   |
+`initialblockdownload` only means the tip is older than `-maxtipage`, which this flavor
+pins at 14 days, so it also clears while a fresh sync is still that far out. Blockchain
+Sync takes it as a fast path only when few blocks are in flight, then asks `getchaintips`
+whether a tip that is neither `active` nor `invalid` sits above the active one — the
+majority chain does not qualify, having been rejected at the split.
 
-**`bitcoind` failing** means the RPC port never opened. The cookie is deleted at the start of every run and recreated by bitcoind itself, so a check still waiting on it is one where bitcoind is not reaching the point of serving RPC — read the service logs for a startup or database error rather than looking for a networking fault.
+## Dependencies
 
-**`sync-progress` is a progress meter, not a fault indicator.** It reports a percentage for the whole of the Initial Block Download, which legitimately runs for hours to days. `initialblockdownload` alone is not trusted here: `-maxtipage` is pinned to 14 days for this chain, so the flag clears while a fresh sync is still far from the tip. Success therefore needs either that flag clear *and* fewer than ten blocks in flight, or `getchaintips` reporting no non-invalid tip above the active one. It reports `starting` whenever the RPC call fails, which is normal while the node is coming up.
+| Dependency | Condition                                                         | Required State |
+| ---------- | ----------------------------------------------------------------- | -------------- |
+| **Tor**    | When `externalip` contains `.onion` or `onlynet` includes `onion` | Running        |
 
-**`i2pd` is the one check written to distinguish "slow" from "never".** Everything reads as starting during the five-minute grace period. Past it, an empty network database means the router never reached a reseed server and will not recover on its own; a reported router error status is surfaced with its number; and a router that has reseeded but built no tunnels yet reports `starting`, because that one does resolve itself.
+When a Tor onion address is added to the peer interface, it is automatically set as `externalip` in `bitcoin.conf` and advertised to peers. Other StartOS services (LND, Core Lightning, Electrs, etc.) depend on Bitcoin Knots.
 
-**It fails closed.** A reply the router cannot answer properly — a JSON-RPC error object rather than a result — carries no numbers, and every comparison above is false against nothing, so such a reply used to fall through to success on a router that had told it nothing. It now reports `starting` until there is a real answer. That matters because the check queries `RouterInfo` without authenticating, which i2pd accepts only because it never validates the token it issues; if it ever starts validating, every reply becomes an error object.
+## Default Overrides
 
-The empty-network-database case is usually not an I2P fault. Reseeding resolves hostnames over the container's resolver, which is the only thing on the node that does — bitcoind resolves through Tor's SOCKS proxy — so a server whose resolver is not answering breaks I2P alone and looks like an I2P bug. `start-cli package attach bitcoind -- sh -c 'getent hosts start9.com'` separates the two: an instant failure is a resolver that is not there, a slow one is upstream servers that are not answering. The same fault shows up in the service logs as bitcoind repeating `Couldn't listen: Cannot connect to 127.0.0.1:7656`, which is the SAM bridge, not the resolver, but the same root cause — i2pd logs at `warn`, so its own account of the failure is in those logs too.
+Only settings that **diverge from upstream Bitcoin Knots defaults** are seeded into `bitcoin.conf` on install. All other settings are left unset, allowing bitcoind to use its built-in defaults. This keeps `bitcoin.conf` minimal and avoids drift when upstream defaults change between versions.
 
-**`tor` and `clearnet` cannot fail.** Each reports `disabled` when its transport is off or excluded by `onlynet`, and otherwise success, with the message distinguishing inbound-and-outbound (an address of that kind is published on the peer interface) from outbound-only. A node with no published address is healthy; it simply cannot receive connections.
+### Seeded overrides (written to `bitcoin.conf` on install)
 
-## Backups and Restore
+| Setting                                         | Upstream Default  | Our Default                      | Reason                                                                           |
+| ----------------------------------------------- | ----------------- | -------------------------------- | -------------------------------------------------------------------------------- |
+| `dbcache`                                       | 450 MiB           | 25% of system RAM (max 5120 MiB) | Faster IBD; reset to upstream default automatically after initial sync completes |
+| `dbbatchsize`                                   | 16777216 (16 MiB) | RAM-scaled (16–32 MiB)           | Faster UTXO writes during sync; reset to upstream default after initial sync     |
+| `blockfilterindex`                              | off               | `basic`                          | Required by dependent services (Electrs, etc.) for BIP158 filters                |
+| `natpmp`                                        | true              | false                            | NAT-PMP disabled to avoid unexpected port mapping on StartOS                     |
+| `datacarriercost`                               | 4                 | 1                                | Treat extra data as 1 vbyte per actual byte (more permissive relay)              |
+| `zmqpubrawblock`, `zmqpubhashblock`             | off               | `tcp://0.0.0.0:28332`            | Required by dependent services (LND, etc.)                                       |
+| `zmqpubrawtx`, `zmqpubhashtx`, `zmqpubsequence` | off               | `tcp://0.0.0.0:28333`            | Required by dependent services (LND, etc.)                                       |
+| `i2psam`                                        | off               | `127.0.0.1:7656`                 | Embedded I2P daemon for peer-to-peer privacy                                     |
+| `prune` (disk < 900 GB only)                    | 0 (off)           | 550 MiB                          | Automatic pruning on smaller disks                                               |
 
-Both volumes are copied wholesale — `sdk.Backups.ofVolumes('main', 'i2pd')`. There is no dump step and no database engine involved. What makes the backup small is the exclude list, and what it excludes is everything the node can rebuild for itself.
+### Knots-Specific Mempool Policy Defaults
 
-- **Excluded from `main`:** `blocks/`, `chainstate/`, `indexes/`, the RPC `.cookie` (regenerated every start), and any `*-journal`. That is the entire chain, so a backup is megabytes rather than hundreds of gigabytes.
-- **Excluded from `i2pd`:** the router's `netDb/`, `peerProfiles/`, `addressbook/`, `tags/`, `certificates/`, `router.info`, and pidfile — all re-derived by reseeding.
-- **Included:** `bitcoin.conf`, `store.json`, wallet files, `peers.dat`, and i2pd's own `i2pd.conf` and router keys.
+Bitcoin Knots provides enhanced mempool filtering not available in Bitcoin Core. These settings are **upstream Knots defaults** (not our overrides) and are included here for reference:
 
-**A restore does not restore a synced node.** It restores the configuration, the wallets, and the package's own state; the node then performs a full Initial Block Download, rebuilding whichever indexes are enabled as it goes, and the I2P router reseeds from nothing. Download UTXO Snapshot is the supported way to shorten that wait. Until the sync finishes, a restored wallet's balance is only as complete as the chain the node has actually verified.
+| Setting              | Default      | Description                                             |
+| -------------------- | ------------ | ------------------------------------------------------- |
+| `rejectparasites`    | `true`       | Reject parasite transactions                            |
+| `rejecttokens`       | `false`      | Reject token transactions (runes)                       |
+| `mempoolreplacement` | `fee,-optin` | Full RBF (always replace by fee)                        |
+| `mempooltruc`        | `accept`     | Accept TRUC transactions without enforcing restrictions |
+| `permitbaremultisig` | `false`      | Do not relay bare multisig                              |
+
+### Form defaults and footnotes
+
+Every user-exposed field in the configuration actions is optional, including booleans. The pattern:
+
+- **Number / text fields** use `default: null` when our permanent default matches upstream, or `default: <value>` when we override upstream.
+- **Boolean fields** use `Value.triState` with `default: null` when our permanent default matches upstream, or `default: true` / `default: false` when we override. The null (middle) state omits the key from `bitcoin.conf` and bitcoind uses its upstream default; explicit `true` / `false` write the option.
+- **`footnote: 'Default: <val>'`** — every field annotates its **upstream** bitcoind default in the footnote, so users can see what value applies when the field is left empty / null.
+
+Where our permanent default overrides upstream, the input spec's `default` and the value seeded into `bitcoin.conf` by `seedFiles.ts` share a single source of truth: constants like `minPrune` and `defaultDatacarriercost` are exported from `bitcoin.conf.ts` and imported by `seedFiles.ts` so the form and seed cannot drift.
+
+`dbcache` and `dbbatchsize` are special: the seeded values (`defaultDbcache()`, `defaultDbbatchsize()` — RAM-scaled) are an **IBD-only boost**. After initial sync completes, `main.ts` clears them so bitcoind reverts to upstream defaults. Because the permanent default matches upstream, the input spec uses `default: null` rather than the boost value.
 
 ## Limitations and Differences
 
-1. **Blockchain data is never backed up.** A restore re-syncs the chain from the network.
-2. **`rpcuser` and `rpcpassword` are not supported.** They are removed from `bitcoin.conf` on every write; authentication is the `.cookie` file or an `rpcauth` user created through the action.
-3. **`mempoolfullrbf` cannot be set** — it is modelled as must-be-absent and is deleted like the credential pair above.
-4. **Pruning is chosen by disk size**, not asked for, and pruning forces `txindex` off.
-5. **`getblock` verbosity 2 still fails for a pruned block.** The proxy intercepts verbosity 0 and 1 only. Verbosity 2 could not be answered faithfully anyway: its per-input fee fields need undo data a pruned node no longer holds.
-6. **CJDNS is unavailable.** StartOS provides no CJDNS transport, so it is not offered as an `onlynet` option. Clearnet, Tor, and I2P are all fully supported.
-7. **i2pd tuning is not in the StartOS UI.** Log level, bandwidth class, transit share, tunnel limits, and the web console are edited in `i2pd.conf` on the `i2pd` volume.
-8. **Shutdown is allowed five minutes** to flush the databases before SIGKILL.
-9. **The I2P router is emulated on riscv64**, which has no upstream i2pd image.
-10. **This flavor follows the RDTS chain**, which is not the chain Bitcoin Core and Bitcoin Knots (pre-RDTS) follow. Blocks arrive roughly once every day or two, and the two chains share no replay protection.
-11. **`consensusrules` does not gate enforcement.** This build enforces RDTS whether or not the option is present; the option only records consent and silences an hourly warning.
-12. **`maxtipage` is pinned to 14 days** so transaction relay is not suppressed by the chain's slow block production.
-13. **Every Wallet action disappears when `disablewallet` is on**, and all of them require the service to be running.
-14. **The repo maintains one branch per flavor**, each published as the same `bitcoind` package. Release notes and pinned upstream versions differ between them.
+1. **Custom Docker image** — built from source with ZMQ support; adds runtime utilities not in upstream releases
+2. **Tor proxy always configured** — the `-onion` flag is set to the StartOS Tor proxy on every start; Tor itself is a conditional dependency (required only when onion connectivity is configured)
+3. **RPC cookie auth enforced** — `rpcuser`/`rpcpassword` are forcibly removed; authentication uses `.cookie` or `rpcauth` credentials generated via the action
+4. **Disk-aware defaults** — pruning and txindex are auto-configured based on available disk space (< 900 GB enables pruning)
+5. **Pruned nodes use RPC proxy** — an intermediary `btc-rpc-proxy` container transparently fetches pruned blocks over the P2P network
+6. **Shared package ID** — uses `bitcoind` as the package ID, shared with Bitcoin Core; only one flavor can be installed at a time
+7. **5-minute shutdown timeout** — SIGTERM allows 300 seconds for graceful database flush
+8. **Embedded I2P enabled by default** — a bundled `i2pd` daemon provides the I2P SAM proxy, with `i2pacceptincoming=true`; inbound I2P connections work out of the box with no user configuration. Can be disabled via Peer Settings
+9. **CJDNS not supported** — StartOS provides no CJDNS transport, so `cjdns` is not offered as an `onlynet` option and CJDNS peer connectivity is unavailable; the other three Bitcoin networks (clearnet, Tor, I2P) are fully supported
+10. **`maxtipage` pinned to 14 days** — upstream ignores peers' transactions while it considers itself syncing, so on a chain producing a block every day or two a caught-up node would keep no mempool. Pinned by the file model (`z.literal().catch()`) rather than seeded, so deleting or editing the line restores it on the next write. Core and pre-RDTS Knots parse unknown keys through rather than dropping them, so each Knots→Core `down` migration removes it alongside `consensusrules`
+
+## What Is Unchanged from Upstream
+
+- Block validation and consensus rules
+- Peer-to-peer networking (gossip, block relay, transaction relay)
+- Wallet functionality (key management, signing, coin selection)
+- JSON-RPC API (all commands)
+- ZeroMQ notification interface
+- Transaction and block index behavior
+- Knots-specific policy enforcement (rejectparasites, rejecttokens, etc.)
+- Mining/block template support
+- BIP compliance (BIP324, BIP158, BIP157, etc.)
+
+## Contributing
+
+Build and development workflow follow the StartOS packaging guide: <https://docs.start9.com/packaging>. Keep `README.md`, `instructions.md`, and `AGENTS.md` in sync with any change to user-visible behavior or package structure.
 
 ---
 
@@ -380,11 +423,38 @@ tasks:
   - { action: activate-rdts, severity: critical }
   - { action: assumeutxo, severity: important }
 health_checks:
-  - bitcoind # the daemon's ready check, displayed "RPC"
-  - sync-progress # displayed "Blockchain Sync"
-  - i2pd # displayed "I2P"; only while I2P is enabled
-  - i2p # displayed "I2P"; the disabled placeholder otherwise
-  - tor
-  - clearnet
-  - proxy # displayed "RPC Proxy"; only while pruned
+  - rpc: port_listening 8332 (or 58332 pruned), after .cookie file exists
+  - sync-progress: bitcoin-cli_getblockchaininfo + getchaintips (30s trigger; 5s during starting/failure)
+  - i2p: port_listening / status
+  - tor: install/running status + onion address check
+  - clearnet: published IP address check
+  - rpc-proxy: port_listening (pruned only)
+backup_volumes:
+  - main (excluding blocks/, chainstate/, indexes/)
+  - i2pd (excluding ephemeral data)
+knots_specific_settings:
+  - rejectparasites
+  - rejecttokens
+  - mempoolreplacement
+  - mempooltruc
+  - permitbaredatacarrier
+  - permitbareanchor
+  - permitbarepubkey
+  - permitephemeral
+  - maxscriptsize
+  - datacarriercost
+  - acceptnonstddatacarrier
+  - dustrelayfee
+  - bytespersigopstrict
+  - maxtxlegacysigops
+  - acceptunknownwitness
+  - minrelaycoinblocks
+  - minrelaymaturity
+  - softwareexpiry
+  - natpmp
+  - maxuploadtarget
+  - blockmaxsize
+  - blockmaxweight
+  - blockreconstructionextratxn
+  - blockreconstructionextratxnsize
 ```

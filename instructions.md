@@ -25,8 +25,6 @@ Bitcoin Knots starts and begins Initial Block Download (IBD) immediately on inst
 
 > Initial Block Download takes hours to days depending on hardware and network. The node is functional immediately but RPC calls that depend on chain state will return partial results until sync completes.
 
-> On the RDTS chain the **Blockchain Sync** check reads "Bitcoin is fully synced" as soon as your node holds every block that chain has — which, at a block every day or two, is most of the time. Synced here means caught up with the RDTS chain, not that the chain is moving.
-
 ## Using Bitcoin Knots
 
 ### RPC
