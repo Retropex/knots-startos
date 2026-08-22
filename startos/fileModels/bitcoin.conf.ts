@@ -9,6 +9,8 @@ import {
   peerPortLocal,
   rpcallowip,
   rpcallowipPruned,
+  rpcbind,
+  rpcbindPruned,
   rpccookiefile,
   zmqBundle,
 } from '../utils'
@@ -55,12 +57,16 @@ type ValidNets = z.infer<typeof onlyNetOption>
 export const shape = z
   .object({
     // RPC enforced
+    rpcbind: z.enum([rpcbind, rpcbindPruned]).catch(rpcbind),
     rpcallowip: z.enum([rpcallowip, rpcallowipPruned]).catch(rpcallowip),
     rpcuser: z.undefined().optional().catch(undefined),
     rpcpassword: z.undefined().optional().catch(undefined),
     rpccookiefile: z.literal('/root/.bitcoin/.cookie').catch('/root/.bitcoin/.cookie'),
     // Peers enforced
     listen: z.literal(true).catch(true),
+    bind: z
+      .union([z.array(z.string()).transform((a) => a.at(-1)!), z.string()])
+      .catch(`0.0.0.0:${peerPortInternal}`),
     whitebind: z
       .literal(`0.0.0.0:${peerPortLocal}`)
       .catch(`0.0.0.0:${peerPortLocal}`),
@@ -1153,6 +1159,7 @@ function formToFile(
     // Enforced fields
     rpccookiefile: '/root/.bitcoin/.cookie',
     listen: true,
+    bind: `0.0.0.0:${peerPortInternal}`,
     whitebind: `0.0.0.0:${peerPortLocal}`,
     deprecatedrpc: 'create_bdb',
     rpcauth: raw?.rpcauth?.filter((a) => !!a) as string[] | undefined,
@@ -1160,6 +1167,7 @@ function formToFile(
     externalip: raw?.externalip?.filter((a) => !!a) as string[] | undefined,
 
     // RPC (prune-derived)
+    rpcbind: prune ? rpcbindPruned : rpcbind,
     rpcallowip: prune ? rpcallowipPruned : rpcallowip,
 
     // Mempool - 1:1 pass-through
