@@ -7,6 +7,7 @@ import { otherConfig } from './config/other'
 import { peerConfig } from './config/peers'
 import { rpcConfig } from './config/rpc'
 import { deleteCoinstatsIndex } from './deleteCoinstatsIndex'
+import { deleteTestnetChain } from './deleteTestnetData'
 import { deletePeers } from './deletePeers'
 import { deleteRpcAuth } from './deleteRpcAuth'
 import { deleteTxIndex } from './deleteTxIndex'
@@ -31,6 +32,7 @@ export const actions = sdk.Actions.of()
   .addAction(rpcConfig)
   .addAction(assumeutxo)
   .addAction(deleteCoinstatsIndex)
+  .addAction(deleteTestnetChain)
   .addAction(deletePeers)
   .addAction(deleteRpcAuth)
   .addAction(deleteTxIndex)
