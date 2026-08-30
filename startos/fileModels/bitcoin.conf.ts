@@ -61,7 +61,9 @@ export const shape = z
     rpcallowip: z.enum([rpcallowip, rpcallowipPruned]).catch(rpcallowip),
     rpcuser: z.undefined().optional().catch(undefined),
     rpcpassword: z.undefined().optional().catch(undefined),
-    rpccookiefile: z.literal('/root/.bitcoin/.cookie').catch('/root/.bitcoin/.cookie'),
+    rpccookiefile: z
+      .literal('/root/.bitcoin/.cookie')
+      .catch('/root/.bitcoin/.cookie'),
     // Peers enforced
     listen: z.literal(true).catch(true),
     bind: z
@@ -1269,6 +1271,16 @@ function formToFile(
   }
 }
 
+function stripTestnet4Section(a: any) {
+  if (!a || typeof a !== 'object' || Array.isArray(a)) return a
+
+  const { testnet4, ...rest } = a as Record<string, unknown>
+
+  return testnet4 && typeof testnet4 === 'object' && !Array.isArray(testnet4)
+    ? { ...rest, ...(testnet4 as Record<string, unknown>) }
+    : rest
+}
+
 export const bitcoinConfFile = FileHelper.ini(
   {
     base: sdk.volumes.main,
@@ -1278,12 +1290,11 @@ export const bitcoinConfFile = FileHelper.ini(
   { bracketedArray: false },
   {
     onRead: (a) => {
-      const section = (a as any)?.testnet4 ?? a
-      const base = shape.parse(section)
+      const base = shape.parse(stripTestnet4Section(a))
       return fileToForm(base)
     },
     onWrite: (a) => {
-      return { testnet4: stringifyPrimitives(formToFile(a)) }
+      return stripTestnet4Section(stringifyPrimitives(formToFile(a)))
     },
   },
 )

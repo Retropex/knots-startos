@@ -95,7 +95,7 @@ export const main = sdk.setupMain(async ({ effects }) => {
     return { cancel: false }
   })
 
-  const bitcoinArgs: string[] = [`-onion=${torSocks}`, '-chain=testnet4']
+  const bitcoinArgs: string[] = [`-onion=${torSocks}`]
 
   if (reindexBlockchain) {
     bitcoinArgs.push('-reindex')
