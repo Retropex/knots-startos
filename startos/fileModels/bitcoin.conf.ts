@@ -166,7 +166,7 @@ export const shape = z
 
     // Other
     softwareexpiry: iniNumber,
-    blake2b_headline: iniString,
+    blake2b_headline: z.literal('8-30 NYPost Deride And Conquer').catch('8-30 NYPost Deride And Conquer'),
     blocknotify: iniString,
     prune: z
       .union([
@@ -530,13 +530,7 @@ export const fullConfigSpec = sdk.InputSpec.of({
     integer: true,
     units: i18n('timestamp'),
   }),
-  blake2b_headline: Value.text({
-    name: 'BLAKE2b headline',
-    description: 'Specify consensus-critical proof-of-time news headline',
-    required: true,
-    default: null,
-    warning: 'MUST BE SET TO EXACT CORRECT STRING',
-  }),
+  
   zmqEnabled: Value.triState({
     name: i18n('ZeroMQ Enabled'),
     description: i18n(
@@ -954,7 +948,6 @@ function fileToForm(
     zmqpubsequence,
     // Other
     softwareexpiry,
-    blake2b_headline,
     txindex,
     coinstatsindex,
     disablewallet,
@@ -1023,7 +1016,6 @@ function fileToForm(
 
     // Other - with transforms
     softwareexpiry,
-    blake2b_headline,
     zmqEnabled: !!(
       zmqpubhashblock &&
       zmqpubhashtx &&
@@ -1128,7 +1120,6 @@ function formToFile(
     minrelaymaturity,
     // Other
     softwareexpiry,
-    blake2b_headline,
     prune,
     wallet,
     txindex,
@@ -1212,7 +1203,7 @@ function formToFile(
 
     // Other
     softwareexpiry,
-    blake2b_headline,
+    blake2b_headline: '8-30 NYPost Deride And Conquer',
     txindex: prune ? false : (txindex ?? undefined),
     coinstatsindex: coinstatsindex ?? undefined,
     peerbloomfilters: peerbloomfilters ?? undefined,
