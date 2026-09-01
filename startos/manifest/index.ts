@@ -25,7 +25,7 @@ export const manifest = setupManifest({
     },
     proxy: {
       source: {
-        dockerTag: 'ghcr.io/start9labs/btc-rpc-proxy:v0.5.1',
+        dockerTag: 'ghcr.io/start9labs/btc-rpc-proxy:v0.8.0',
       },
       arch: ['x86_64', 'aarch64', 'riscv64'],
     },
