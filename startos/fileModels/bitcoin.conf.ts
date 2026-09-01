@@ -166,7 +166,6 @@ export const shape = z
 
     // Other
     softwareexpiry: iniNumber,
-    blake2b_headline: z.literal('8-30 NYPost Deride And Conquer').catch('8-30 NYPost Deride And Conquer'),
     blocknotify: iniString,
     prune: z
       .union([
@@ -1203,7 +1202,6 @@ function formToFile(
 
     // Other
     softwareexpiry,
-    blake2b_headline: '8-30 NYPost Deride And Conquer',
     txindex: prune ? false : (txindex ?? undefined),
     coinstatsindex: coinstatsindex ?? undefined,
     peerbloomfilters: peerbloomfilters ?? undefined,
