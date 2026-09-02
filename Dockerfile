@@ -27,18 +27,18 @@ ENV PINNED_FINGERPRINTS="\
 95636F3538D9262765AB29BEE952E584CA8C0F45 \
 A47D99B6DB0D715D40C59A2023AE8A8EA7E24E38 \
 DAED928C727D3E613EC46635F5073C4F4882FFFC"
-ENV REQUIRED_QUORUM=1
+ENV REQUIRED_QUORUM=3
 
 RUN case "${TARGETPLATFORM}" in \
-      "linux/amd64")   echo "bitcoin-${VERSION}rc5-x86_64-linux-gnu.tar.gz"    > /tarball-name ;; \
-      "linux/arm64")   echo "bitcoin-${VERSION}rc5-aarch64-linux-gnu.tar.gz"   > /tarball-name ;; \
-      "linux/riscv64") echo "bitcoin-${VERSION}rc5-riscv64-linux-gnu.tar.gz"   > /tarball-name ;; \
+      "linux/amd64")   echo "bitcoin-${VERSION}-x86_64-linux-gnu.tar.gz"    > /tarball-name ;; \
+      "linux/arm64")   echo "bitcoin-${VERSION}-aarch64-linux-gnu.tar.gz"   > /tarball-name ;; \
+      "linux/riscv64") echo "bitcoin-${VERSION}-riscv64-linux-gnu.tar.gz"   > /tarball-name ;; \
       *) echo "Unsupported platform: ${TARGETPLATFORM}" && exit 1 ;; \
     esac
 
-RUN wget https://test.bitcoinknots.org/~luke-jr/programs/bitcoin/files/bitcoin-knots/${PATH_VERSION}/${VERSION}/test/rc5/$(cat /tarball-name) \
-         https://test.bitcoinknots.org/~luke-jr/programs/bitcoin/files/bitcoin-knots/${PATH_VERSION}/${VERSION}/test/rc5/SHA256SUMS.asc \
-         https://test.bitcoinknots.org/~luke-jr/programs/bitcoin/files/bitcoin-knots/${PATH_VERSION}/${VERSION}/test/rc5/SHA256SUMS
+RUN wget https://test.bitcoinknots.org/~luke-jr/programs/bitcoin/files/bitcoin-knots/${PATH_VERSION}/${VERSION}/$(cat /tarball-name) \
+         https://test.bitcoinknots.org/~luke-jr/programs/bitcoin/files/bitcoin-knots/${PATH_VERSION}/${VERSION}/SHA256SUMS.asc \
+         https://test.bitcoinknots.org/~luke-jr/programs/bitcoin/files/bitcoin-knots/${PATH_VERSION}/${VERSION}/SHA256SUMS
 
 COPY assets/release-keys/ /tmp/release-keys/
 
