@@ -61,9 +61,7 @@ export const shape = z
     rpcallowip: z.enum([rpcallowip, rpcallowipPruned]).catch(rpcallowip),
     rpcuser: z.undefined().optional().catch(undefined),
     rpcpassword: z.undefined().optional().catch(undefined),
-    rpccookiefile: z
-      .literal('/root/.bitcoin/.cookie')
-      .catch('/root/.bitcoin/.cookie'),
+    rpccookiefile: z.literal(rpccookiefile).catch(rpccookiefile),
     // Peers enforced
     listen: z.literal(true).catch(true),
     bind: z
@@ -1149,7 +1147,7 @@ function formToFile(
     ...raw,
 
     // Enforced fields
-    rpccookiefile: '/root/.bitcoin/.cookie',
+    rpccookiefile: '.cookie',
     listen: true,
     bind: `0.0.0.0:${peerPortInternal}`,
     whitebind: `0.0.0.0:${peerPortLocal}`,
