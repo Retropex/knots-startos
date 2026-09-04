@@ -3,7 +3,7 @@ import { rm } from 'fs/promises'
 import { bitcoinConfFile } from '../fileModels/bitcoin.conf'
 
 export const current = VersionInfo.of({
-  version: '#knots:29.4.1:6',
+  version: '#knots:29.4.1:7',
   releaseNotes: {
     en_US: `Update to Bitcoin Knots v29.4.1.knots20260508`,
     es_ES: `Actualización a Bitcoin Knots v29.4.1.knots20260508`,
@@ -70,5 +70,4 @@ export const current = VersionInfo.of({
     },
   },
 })
-  .satisfies('29.4:10')
-  .satisfies('28.4:23')
+
