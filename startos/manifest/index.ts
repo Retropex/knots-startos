@@ -16,7 +16,7 @@ export const manifest = setupManifest({
       source: {
         dockerBuild: {
           buildArgs: {
-            VERSION: '29.4.1.knots20260508',
+            VERSION: '29.4.2.knots20260508',
             PATH_VERSION: '29.x',
           },
         },
