@@ -301,7 +301,7 @@ export const fullConfigSpec = sdk.InputSpec.of({
     name: i18n('Reject Tokens'),
     description: i18n('Reject tokens transactions (runes)'),
     default: null,
-    footnote: `${i18n('Default')}: false`,
+    footnote: `${i18n('Default')}: true`,
   }),
   mempoolreplacement: Value.select({
     name: i18n('Mempool Replacement'),
